@@ -11,6 +11,14 @@ class MotionAccessPermissions(BaseAccessPermissions):
     """
     base_permission = 'motions.can_see'
 
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import MotionSerializer
+
+        return MotionSerializer
+
     async def get_restricted_data(
             self,
             full_data: List[Dict[str, Any]],
@@ -63,6 +71,14 @@ class MotionChangeRecommendationAccessPermissions(BaseAccessPermissions):
     """
     base_permission = 'motions.can_see'
 
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import MotionChangeRecommendationSerializer
+
+        return MotionChangeRecommendationSerializer
+
     async def get_restricted_data(
             self,
             full_data: List[Dict[str, Any]],
@@ -91,6 +107,14 @@ class MotionCommentSectionAccessPermissions(BaseAccessPermissions):
     """
     base_permission = 'motions.can_see'
 
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import MotionCommentSectionSerializer
+
+        return MotionCommentSectionSerializer
+
     async def get_restricted_data(
             self,
             full_data: List[Dict[str, Any]],
@@ -116,12 +140,28 @@ class StatuteParagraphAccessPermissions(BaseAccessPermissions):
     """
     base_permission = 'motions.can_see'
 
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import StatuteParagraphSerializer
+
+        return StatuteParagraphSerializer
+
 
 class CategoryAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for Category and CategoryViewSet.
     """
     base_permission = 'motions.can_see'
+
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import CategorySerializer
+
+        return CategorySerializer
 
 
 class MotionBlockAccessPermissions(BaseAccessPermissions):
@@ -130,9 +170,25 @@ class MotionBlockAccessPermissions(BaseAccessPermissions):
     """
     base_permission = 'motions.can_see'
 
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import MotionBlockSerializer
+
+        return MotionBlockSerializer
+
 
 class WorkflowAccessPermissions(BaseAccessPermissions):
     """
     Access permissions container for Workflow and WorkflowViewSet.
     """
     base_permission = 'motions.can_see'
+
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import WorkflowSerializer
+
+        return WorkflowSerializer

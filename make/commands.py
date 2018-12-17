@@ -12,9 +12,7 @@ def check(args=None):
     """
     Checks for pep8 and other code styling conventions.
     """
-    value = call('flake8 --max-line-length=150 --statistics openslides tests')
-    value += call('python -m mypy openslides/ tests/')
-    return value
+    return call('flake8 --max-line-length=150 --statistics openslides tests')
 
 
 @command('travis', help='Runs the code that travis does')

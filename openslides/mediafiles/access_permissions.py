@@ -10,6 +10,14 @@ class MediafileAccessPermissions(BaseAccessPermissions):
     """
     base_permission = 'mediafiles.can_see'
 
+    def get_serializer_class(self, user=None):
+        """
+        Returns serializer class.
+        """
+        from .serializers import MediafileSerializer
+
+        return MediafileSerializer
+
     async def get_restricted_data(
             self,
             full_data: List[Dict[str, Any]],

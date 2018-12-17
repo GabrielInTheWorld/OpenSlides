@@ -4,7 +4,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 
 from .access_permissions import BaseAccessPermissions
-from .rest_api import model_serializer_classes
 from .utils import convert_camel_case_to_pseudo_snake_case
 
 
@@ -135,5 +134,4 @@ class RESTModelMixin:
         """
         Returns the full_data of the instance.
         """
-        serializer_class = model_serializer_classes[type(self)]
-        return serializer_class(self).data
+        return self.get_access_permissions().get_full_data(self)

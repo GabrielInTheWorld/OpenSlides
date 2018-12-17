@@ -18,7 +18,6 @@ class MediafilesAppConfig(AppConfig):
         from .projector import get_projector_elements
         from .signals import get_permission_change_data
         from .views import MediafileViewSet
-        from . import serializers  # noqa
         from ..utils.access_permissions import required_user
 
         # Define projector elements.

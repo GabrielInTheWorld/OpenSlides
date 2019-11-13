@@ -24,6 +24,9 @@ import { ViewUser } from 'app/site/users/models/view-user';
 import { AssignmentPdfExportService } from '../../services/assignment-pdf-export.service';
 import { AssignmentPhases, ViewAssignment } from '../../models/view-assignment';
 import { ViewAssignmentRelatedUser } from '../../models/view-assignment-related-user';
+import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
+import { BasePoll, PercentBase, MajorityMethod, PollType } from 'app/shared/models/poll/base-poll';
+import { AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
 
 /**
  * Component for the assignment detail view
@@ -168,6 +171,7 @@ export class AssignmentDetailComponent extends BaseViewComponent implements OnIn
         private route: ActivatedRoute,
         formBuilder: FormBuilder,
         public repo: AssignmentRepositoryService,
+        private pollRepo: AssignmentPollRepositoryService,
         private userRepo: UserRepositoryService,
         private itemRepo: ItemRepositoryService,
         private tagRepo: TagRepositoryService,
@@ -303,7 +307,14 @@ export class AssignmentDetailComponent extends BaseViewComponent implements OnIn
      * Creates a new Poll
      */
     public async createPoll(): Promise<void> {
-        // await this.repo.createPoll(this.assignment).catch(this.raiseError);
+        await this.pollRepo.create(<any>{
+            assignment_id: this.assignment.id,
+            pollmethod: "YN",
+            onehundred_percent_base: PercentBase.YN,
+            majority_method: MajorityMethod.Simple,
+            type: PollType.Named,
+            title: "test"
+        }).catch(this.raiseError);
     }
 
     /**

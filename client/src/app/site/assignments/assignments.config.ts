@@ -8,6 +8,9 @@ import { Assignment } from '../../shared/models/assignments/assignment';
 import { ViewAssignment } from './models/view-assignment';
 import { ViewAssignmentPoll } from './models/view-assignment-poll';
 import { ViewAssignmentVote } from './models/view-assignment-vote';
+import { AssignmentOption } from 'app/shared/models/assignments/assignment-option';
+import { ViewAssignmentOption } from './models/view-assignment-option';
+import { AssignmentOptionRepositoryService } from 'app/core/repositories/assignments/assignment-option-repository.service';
 
 export const AssignmentsAppConfig: AppConfig = {
     name: 'assignments',
@@ -27,6 +30,11 @@ export const AssignmentsAppConfig: AppConfig = {
             model: AssignmentVote,
             viewModel: ViewAssignmentVote,
             repository: AssignmentVoteRepositoryService
+        },
+        {
+            model: AssignmentOption,
+            viewModel: ViewAssignmentOption,
+            repository: AssignmentOptionRepositoryService
         }
     ],
     mainMenuEntries: [

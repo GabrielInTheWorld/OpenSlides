@@ -6,14 +6,16 @@ import { DataSendService } from 'app/core/core-services/data-send.service';
 import { RelationManagerService } from 'app/core/core-services/relation-manager.service';
 import { ViewModelStoreService } from 'app/core/core-services/view-model-store.service';
 import { RelationDefinition } from 'app/core/definitions/relations';
+import { VotingService } from 'app/core/ui-services/voting.service';
 import { AssignmentOption } from 'app/shared/models/assignments/assignment-option';
 import { AssignmentPoll } from 'app/shared/models/assignments/assignment-poll';
 import { ViewAssignmentOption } from 'app/site/assignments/models/view-assignment-option';
 import { AssignmentPollTitleInformation, ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-poll';
 import { ViewAssignmentVote } from 'app/site/assignments/models/view-assignment-vote';
+import { BasePollRepositoryService } from 'app/site/polls/services/base-poll-repository.service';
 import { ViewGroup } from 'app/site/users/models/view-group';
 import { ViewUser } from 'app/site/users/models/view-user';
-import { BaseRepository, NestedModelDescriptors } from '../base-repository';
+import { NestedModelDescriptors } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
 
@@ -29,36 +31,14 @@ const AssignmentPollRelations: RelationDefinition[] = [
         ownIdKey: 'voted_id',
         ownKey: 'voted',
         foreignViewModel: ViewUser
+    },
+    {
+        type: 'O2M',
+        ownIdKey: 'options_id',
+        ownKey: 'options',
+        foreignViewModel: ViewAssignmentOption
     }
 ];
-
-const AssignmentPollNestedModelDescriptors: NestedModelDescriptors = {
-    'assignments/assignment-poll': [
-        {
-            ownKey: 'options',
-            foreignViewModel: ViewAssignmentOption,
-            foreignModel: AssignmentOption,
-            order: 'weight',
-            relationDefinitionsByKey: {
-                user: {
-                    type: 'M2O',
-                    ownIdKey: 'user_id',
-                    ownKey: 'user',
-                    foreignViewModel: ViewUser
-                },
-                votes: {
-                    type: 'O2M',
-                    foreignIdKey: 'option_id',
-                    ownKey: 'votes',
-                    foreignViewModel: ViewAssignmentVote
-                }
-            },
-            titles: {
-                getTitle: (viewOption: ViewAssignmentOption) => (viewOption.user ? viewOption.user.getTitle() : '')
-            }
-        }
-    ]
-};
 
 /**
  * Repository Service for Assignments.
@@ -68,7 +48,7 @@ const AssignmentPollNestedModelDescriptors: NestedModelDescriptors = {
 @Injectable({
     providedIn: 'root'
 })
-export class AssignmentPollRepositoryService extends BaseRepository<
+export class AssignmentPollRepositoryService extends BasePollRepositoryService<
     ViewAssignmentPoll,
     AssignmentPoll,
     AssignmentPollTitleInformation
@@ -89,7 +69,8 @@ export class AssignmentPollRepositoryService extends BaseRepository<
         mapperService: CollectionStringMapperService,
         viewModelStoreService: ViewModelStoreService,
         translate: TranslateService,
-        relationManager: RelationManagerService
+        relationManager: RelationManagerService,
+        votingService: VotingService
     ) {
         super(
             DS,
@@ -100,7 +81,8 @@ export class AssignmentPollRepositoryService extends BaseRepository<
             relationManager,
             AssignmentPoll,
             AssignmentPollRelations,
-            AssignmentPollNestedModelDescriptors
+            {},
+            votingService
         );
     }
 

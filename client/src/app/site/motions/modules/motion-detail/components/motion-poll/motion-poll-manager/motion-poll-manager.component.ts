@@ -46,6 +46,7 @@ export class MotionPollManagerComponent extends BaseViewComponent {
         public perms: LocalPermissionsService
     ) {
         super(title, translate, matSnackbar);
+        pollRepo.getViewModelListObservable().subscribe(res => console.log(res, res[0] && res[0].options));
     }
 
     /**

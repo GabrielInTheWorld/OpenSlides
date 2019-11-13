@@ -114,6 +114,7 @@ import { LocalizedDatePipe } from './pipes/localized-date.pipe';
 import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.component';
 import { ChartsComponent } from './components/charts/charts.component';
 import { CheckInputComponent } from './components/check-input/check-input.component';
+import { BannerComponent } from './components/banner/banner.component';
 
 /**
  * Share Module for all "dumb" components and pipes.
@@ -270,7 +271,8 @@ import { CheckInputComponent } from './components/check-input/check-input.compon
         LocalizedDatePipe,
         BreadcrumbComponent,
         ChartsComponent,
-        CheckInputComponent
+        CheckInputComponent,
+        BannerComponent
     ],
     declarations: [
         PermsDirective,
@@ -320,7 +322,8 @@ import { CheckInputComponent } from './components/check-input/check-input.compon
         LocalizedDatePipe,
         BreadcrumbComponent,
         ChartsComponent,
-        CheckInputComponent
+        CheckInputComponent,
+        BannerComponent
     ],
     providers: [
         {

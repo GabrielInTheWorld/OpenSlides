@@ -14,6 +14,7 @@ import { MotionPollDialogComponent } from '../motion-poll/motion-poll-dialog/mot
 import { MotionPollDialogModule } from '../motion-poll/motion-poll-dialog/motion-poll-dialog.module';
 import { MotionPollManagerComponent } from './components/motion-poll/motion-poll-manager/motion-poll-manager.component';
 import { MotionPollPreviewComponent } from './components/motion-poll/motion-poll-preview/motion-poll-preview.component';
+import { MotionPollVoteComponent } from '../motion-poll/motion-poll-vote/motion-poll-vote.component';
 import { MotionPollComponent } from './components/motion-poll/motion-poll.component';
 import { MotionTitleChangeRecommendationDialogComponent } from './components/motion-title-change-recommendation-dialog/motion-title-change-recommendation-dialog.component';
 import { PersonalNoteComponent } from './components/personal-note/personal-note.component';
@@ -32,7 +33,8 @@ import { PersonalNoteComponent } from './components/personal-note/personal-note.
         MotionDetailOriginalChangeRecommendationsComponent,
         MotionChangeRecommendationDialogComponent,
         MotionTitleChangeRecommendationDialogComponent,
-        MotionPollManagerComponent
+        MotionPollManagerComponent,
+        MotionPollVoteComponent
     ],
     entryComponents: [
         MotionCommentsComponent,

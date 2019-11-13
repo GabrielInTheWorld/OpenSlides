@@ -32,9 +32,6 @@ class BaseVote(models.Model):
     class Meta:
         abstract = True
 
-    def get_root_rest_element(self):
-        return self.option.get_root_rest_element()
-
 
 class BaseOption(models.Model):
     """
@@ -75,9 +72,6 @@ class BaseOption(models.Model):
                 f"The option class {cls} has to have an attribute vote_class."
             )
         return cls.vote_class
-
-    def get_root_rest_element(self):
-        return self.poll.get_root_rest_element()
 
 
 class BasePoll(models.Model):

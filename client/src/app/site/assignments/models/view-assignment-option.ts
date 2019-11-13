@@ -2,6 +2,7 @@ import { AssignmentOption } from 'app/shared/models/assignments/assignment-optio
 import { ViewUser } from 'app/site/users/models/view-user';
 import { BaseViewModel } from '../../base/base-view-model';
 import { ViewAssignmentVote } from './view-assignment-vote';
+import { ViewAssignmentPoll } from './view-assignment-poll';
 
 export class ViewAssignmentOption extends BaseViewModel<AssignmentOption> {
     public get option(): AssignmentOption {
@@ -11,9 +12,10 @@ export class ViewAssignmentOption extends BaseViewModel<AssignmentOption> {
     protected _collectionString = AssignmentOption.COLLECTIONSTRING;
 }
 
-interface TIMotionOptionRelations {
+interface TIAssignmentOptionRelations {
     votes: ViewAssignmentVote[];
     user: ViewUser;
+    poll: ViewAssignmentPoll;
 }
 
-export interface ViewAssignmentOption extends AssignmentOption, TIMotionOptionRelations {}
+export interface ViewAssignmentOption extends AssignmentOption, TIAssignmentOptionRelations {}

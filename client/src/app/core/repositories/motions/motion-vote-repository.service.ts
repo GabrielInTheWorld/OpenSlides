@@ -3,10 +3,12 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
 import { DataSendService } from 'app/core/core-services/data-send.service';
+import { HttpService } from 'app/core/core-services/http.service';
 import { RelationManagerService } from 'app/core/core-services/relation-manager.service';
 import { ViewModelStoreService } from 'app/core/core-services/view-model-store.service';
 import { RelationDefinition } from 'app/core/definitions/relations';
 import { MotionVote } from 'app/shared/models/motions/motion-vote';
+import { ViewMotionOption } from 'app/site/motions/models/view-motion-option';
 import { ViewMotionVote } from 'app/site/motions/models/view-motion-vote';
 import { ViewUser } from 'app/site/users/models/view-user';
 import { BaseRepository } from '../base-repository';
@@ -19,6 +21,12 @@ const MotionVoteRelations: RelationDefinition[] = [
         ownIdKey: 'user_id',
         ownKey: 'user',
         foreignViewModel: ViewUser
+    },
+    {
+        type: 'M2O',
+        ownIdKey: 'option_id',
+        ownKey: 'option',
+        foreignViewModel: ViewMotionOption
     }
 ];
 
@@ -45,7 +53,8 @@ export class MotionVoteRepositoryService extends BaseRepository<ViewMotionVote, 
         mapperService: CollectionStringMapperService,
         viewModelStoreService: ViewModelStoreService,
         translate: TranslateService,
-        relationManager: RelationManagerService
+        relationManager: RelationManagerService,
+        private http: HttpService
     ) {
         super(
             DS,
@@ -66,4 +75,12 @@ export class MotionVoteRepositoryService extends BaseRepository<ViewMotionVote, 
     public getVerboseName = (plural: boolean = false) => {
         return this.translate.instant(plural ? 'Votes' : 'Vote');
     };
+
+    public getVotesForUser(pollId: number, userId: number): ViewMotionVote[] {
+        return this.getViewModelList().filter(vote => vote.option.poll_id === pollId && vote.user_id === userId);
+    }
+
+    public sendVote(vote: 'Y' | 'N' | 'A', poll_id: number): Promise<void> {
+        return this.http.post(`/rest/motions/motion-poll/${poll_id}/vote/`, JSON.stringify(vote));
+    }
 }

@@ -18,6 +18,7 @@ from openslides.utils.models import RESTModelMixin
 from ..utils.models import CASCADE_AND_AUTOUPDATE, SET_NULL_AND_AUTOUPDATE
 from .access_permissions import (
     AssignmentAccessPermissions,
+    AssignmentOptionAccessPermissions,
     AssignmentPollAccessPermissions,
     AssignmentVoteAccessPermissions,
 )
@@ -273,6 +274,7 @@ class AssignmentVote(RESTModelMixin, BaseVote):
 
 
 class AssignmentOption(RESTModelMixin, BaseOption):
+    access_permissions = AssignmentOptionAccessPermissions()
     vote_class = AssignmentVote
 
     poll = models.ForeignKey(
@@ -285,9 +287,6 @@ class AssignmentOption(RESTModelMixin, BaseOption):
 
     class Meta:
         default_permissions = ()
-
-    def get_root_rest_element(self):
-        return self.poll
 
 
 class AssignmentPollManager(BaseManager):

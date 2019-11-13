@@ -105,31 +105,4 @@ export class MotionPollPreviewComponent extends BaseViewComponent {
     public openPoll(): void {
         this.router.navigate(['motions', 'polls', this.poll.id]);
     }
-
-    /**
-     * Gets the type of the motion-poll.
-     *
-     * @returns The verbose type as string.
-     */
-    public getMotionPollType(): string {
-        return this.poll.poll.typeVerbose;
-    }
-
-    /**
-     * Gets the current state of the motion-poll.
-     *
-     * @returns The verbose state as string.
-     */
-    public getMotionPollState(): string {
-        return this.poll.poll.stateVerbose;
-    }
-
-    /**
-     * Searches for the parent-motion of this poll.
-     *
-     * @returns a `ViewMotion`.
-     */
-    public getMotionOfPoll(): ViewMotion {
-        return this.motionRepo.getViewModel(this.poll.motion_id);
-    }
 }

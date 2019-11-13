@@ -16,6 +16,7 @@ import { PrioritizeService } from './core/core-services/prioritize.service';
 import { RoutingStateService } from './core/ui-services/routing-state.service';
 import { ServertimeService } from './core/core-services/servertime.service';
 import { ThemeService } from './core/ui-services/theme.service';
+import { VotingBannerService } from './core/ui-services/voting-banner.service';
 
 declare global {
     /**
@@ -24,6 +25,7 @@ declare global {
      */
     interface Array<T> {
         flatMap(o: any): any[];
+        intersect(a: T[]): T[];
     }
 
     /**
@@ -77,7 +79,8 @@ export class AppComponent {
         dataStoreUpgradeService: DataStoreUpgradeService, // to start it.
         prioritizeService: PrioritizeService,
         pingService: PingService,
-        routingState: RoutingStateService
+        routingState: RoutingStateService,
+        votingBannerService: VotingBannerService // needed for initialisation
     ) {
         // manually add the supported languages
         translate.addLangs(['en', 'de', 'cs', 'ru']);
@@ -90,7 +93,7 @@ export class AppComponent {
 
         // change default JS functions
         this.overloadArrayToString();
-        this.overloadFlatMap();
+        this.overloadArrayFunctions();
         this.overloadModulo();
 
         servertimeService.startScheduler();
@@ -126,14 +129,25 @@ export class AppComponent {
     }
 
     /**
-     * Adds an implementation of flatMap.
-     * TODO: Remove once flatMap made its way into official JS/TS (ES 2019?)
+     * Adds an implementation of flatMap and intersect.
      */
-    private overloadFlatMap(): void {
+    private overloadArrayFunctions(): void {
+        // TODO: Remove once flatMap made its way into official JS/TS (ES 2019?)
         const concat = (x: any, y: any) => x.concat(y);
         const flatMap = (f: any, xs: any) => xs.map(f).reduce(concat, []);
         Array.prototype.flatMap = function(f: any): any[] {
             return flatMap(f, this);
+        };
+
+        // intersect
+        Array.prototype.intersect = function<T>(other: T[]): T[] {
+            let a = this,
+                b = other;
+            // indexOf to loop over shorter
+            if (b.length > a.length) {
+                [a, b] = [b, a];
+            }
+            return a.filter(e => b.indexOf(e) > -1);
         };
     }
 

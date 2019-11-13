@@ -7,15 +7,14 @@ import { HttpService } from 'app/core/core-services/http.service';
 import { RelationManagerService } from 'app/core/core-services/relation-manager.service';
 import { ViewModelStoreService } from 'app/core/core-services/view-model-store.service';
 import { RelationDefinition } from 'app/core/definitions/relations';
-import { MotionOption } from 'app/shared/models/motions/motion-option';
+import { VotingService } from 'app/core/ui-services/voting.service';
 import { MotionPoll } from 'app/shared/models/motions/motion-poll';
 import { PollState } from 'app/shared/models/poll/base-poll';
 import { ViewMotionOption } from 'app/site/motions/models/view-motion-option';
 import { MotionPollTitleInformation, ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
-import { ViewMotionVote } from 'app/site/motions/models/view-motion-vote';
+import { BasePollRepositoryService } from 'app/site/polls/services/base-poll-repository.service';
 import { ViewGroup } from 'app/site/users/models/view-group';
 import { ViewUser } from 'app/site/users/models/view-user';
-import { BaseRepository, NestedModelDescriptors } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
 
@@ -34,27 +33,6 @@ const MotionPollRelations: RelationDefinition[] = [
     }
 ];
 
-const MotionPollNestedModelDescriptors: NestedModelDescriptors = {
-    'motions/motion-poll': [
-        {
-            ownKey: 'options',
-            foreignViewModel: ViewMotionOption,
-            foreignModel: MotionOption,
-            relationDefinitionsByKey: {
-                votes: {
-                    type: 'O2M',
-                    foreignIdKey: 'option_id',
-                    ownKey: 'votes',
-                    foreignViewModel: ViewMotionVote
-                }
-            },
-            titles: {
-                getTitle: (viewOption: ViewMotionOption) => ''
-            }
-        }
-    ]
-};
-
 /**
  * Repository Service for Assignments.
  *
@@ -63,19 +41,20 @@ const MotionPollNestedModelDescriptors: NestedModelDescriptors = {
 @Injectable({
     providedIn: 'root'
 })
-export class MotionPollRepositoryService extends BaseRepository<
+export class MotionPollRepositoryService extends BasePollRepositoryService<
     ViewMotionPoll,
     MotionPoll,
     MotionPollTitleInformation
 > {
     public constructor(
+        private http: HttpService,
         DS: DataStoreService,
         dataSend: DataSendService,
         mapperService: CollectionStringMapperService,
         viewModelStoreService: ViewModelStoreService,
         translate: TranslateService,
         relationManager: RelationManagerService,
-        private http: HttpService
+        votingService: VotingService
     ) {
         super(
             DS,
@@ -86,7 +65,8 @@ export class MotionPollRepositoryService extends BaseRepository<
             relationManager,
             MotionPoll,
             MotionPollRelations,
-            MotionPollNestedModelDescriptors
+            {},
+            votingService
         );
     }
 

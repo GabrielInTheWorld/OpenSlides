@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Label } from 'ng2-charts';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+import { HttpService } from 'app/core/core-services/http.service';
 import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
 import { GroupRepositoryService } from 'app/core/repositories/users/group-repository.service';
 import { PromptService } from 'app/core/ui-services/prompt.service';

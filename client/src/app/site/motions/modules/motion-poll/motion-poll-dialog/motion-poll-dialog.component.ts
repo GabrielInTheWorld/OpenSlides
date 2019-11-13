@@ -11,9 +11,11 @@ import { GroupRepositoryService } from 'app/core/repositories/users/group-reposi
 import { MotionPoll, MotionPollMethods } from 'app/shared/models/motions/motion-poll';
 import { OneOfValidator } from 'app/shared/validators/one-of-validator';
 import { BaseViewComponent } from 'app/site/base/base-view';
-import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
+import { ViewMotionPoll, MotionPollMethodsVerbose } from 'app/site/motions/models/view-motion-poll';
 import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
 import { ViewGroup } from 'app/site/users/models/view-group';
+import { PollTypeVerbose, PercentBaseVerbose, MajorityMethodVerbose } from 'app/site/polls/models/view-base-poll';
+import { PercentBase } from 'app/shared/models/poll/base-poll';
 
 /**
  * A dialog for updating the values of a poll.
@@ -37,22 +39,22 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
     /**
      * The different methods for this poll.
      */
-    public pollMethods = this.pollService.getMotionPollMethodsVerbose();
+    public pollMethods = MotionPollMethodsVerbose;
 
     /**
      * The different types the poll can accept.
      */
-    public pollTypes = this.pollService.getPollTypeVerbose();
+    public pollTypes = PollTypeVerbose;
 
     /**
      * The percent base for the poll.
      */
-    public percentBases: object = this.pollService.getPercentBaseVerbose();
+    public percentBases: object = PercentBaseVerbose;
 
     /**
      * The majority methods for the poll.
      */
-    public majorityMethods = this.pollService.getMajorityMethodVerbose();
+    public majorityMethods = MajorityMethodVerbose;
 
     /**
      * Reference to the observable of the groups. Used by the `search-value-component`.
@@ -184,7 +186,7 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
             this.dialogVoteForm.addControl('A', this.fb.control('', [Validators.min(-2)]));
         }
         if (this.data.poll) {
-            this.updateDialogVoteForm(this.data.poll);
+            this.updateDialogVoteForm(this.data);
         }
     }
 
@@ -197,7 +199,7 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
         }
     }
 
-    private updateDialogVoteForm(data: MotionPoll): void {
+    private updateDialogVoteForm(data: ViewMotionPoll): void {
         const update = {
             Y: data.options[0].yes,
             N: data.options[0].no,
@@ -251,13 +253,13 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
         }
         if (this.contentForm.get('pollmethod').value === 'YN') {
             this.percentBases = {};
-            for (const [key, value] of Object.entries(this.pollService.getPercentBaseVerbose())) {
+            for (const [key, value] of Object.entries(PercentBaseVerbose)) {
                 if (key !== 'YNA') {
                     this.percentBases[key] = value;
                 }
             }
         } else {
-            this.percentBases = this.pollService.getPercentBaseVerbose();
+            this.percentBases = PercentBaseVerbose;
         }
     }
 

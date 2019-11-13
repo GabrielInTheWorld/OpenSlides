@@ -37,6 +37,10 @@
             <div>{{ 'Poll method' | translate }}: {{ poll.pollmethodVerbose | translate }}</div>
             <div>{{ 'Majority method' | translate }}: {{ poll.majorityMethodVerbose | translate }}</div>
             <div>{{ '100% base' | translate }}: {{ poll.percentBaseVerbose | translate }}</div>
+            <button mat-button (click)="setState(1)">1</button>
+            <button mat-button (click)="setState(2)">2</button>
+            <button mat-button (click)="setState(3)">3</button>
+            <button mat-button (click)="setState(4)">4</button>
         </div>
 
         <div *ngIf="poll.state === 3 || poll.state === 4">

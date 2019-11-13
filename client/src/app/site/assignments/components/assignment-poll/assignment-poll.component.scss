@@ -17,6 +17,13 @@
         }
     }
 
+    .voting-grid {
+        display: grid;
+        grid-gap: 5px;
+        padding: 5px;
+        grid-template-columns: auto auto;
+    }
+
     .poll-menu {
         position: absolute;
         top: 0;

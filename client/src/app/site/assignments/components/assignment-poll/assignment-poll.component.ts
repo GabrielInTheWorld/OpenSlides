@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
@@ -13,6 +13,9 @@ import { AssignmentPollPdfService } from '../../services/assignment-poll-pdf.ser
 import { ViewAssignment } from '../../models/view-assignment';
 import { ViewAssignmentOption } from '../../models/view-assignment-option';
 import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
+import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
+import { PromptService } from 'app/core/ui-services/prompt.service';
+import { AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
 
 /**
  * Component for a single assignment poll. Used in assignment detail view
@@ -42,12 +45,6 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
     public descriptionForm: FormGroup;
 
     /**
-     * The selected Majority method to display quorum calculations. Will be
-     * set/changed by the user
-     */
-    public majorityChoice: MajorityMethod | null;
-
-    /**
      * permission checks.
      * TODO stub
      *
@@ -57,34 +54,15 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         return this.operator.hasPerms('assignments.can_manage');
     }
 
-    /**
-     * Gets the voting options
-     *
-     * @returns all used (not undefined) option-independent values that are
-     * used in this poll (e.g.)
-     */
-    public get pollValues(): CalculablePollKey[] {
-        // return this.pollService.getVoteOptionsByPoll(this.poll);
-        throw new Error('TODO');
+    public get canSee(): boolean {
+        return this.operator.hasPerms('assignments.can_see');
     }
 
     /**
      * @returns true if the description on the form differs from the poll's description
      */
     public get dirtyDescription(): boolean {
-        // return this.descriptionForm.get('description').value !== this.poll.description;
-        throw new Error('TODO');
-    }
-
-    /**
-     * @returns true if vote results can be seen by the user
-     */
-    public get pollData(): boolean {
-        /*if (!this.poll.has_votes) {
-            return false;
-        }
-        return this.poll.published || this.canManage;*/
-        throw new Error('TODO');
+        return this.descriptionForm.get('description').value !== this.poll.description;
     }
 
     /**
@@ -100,11 +78,11 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
             return '';
         }
         switch (this.poll.pollmethod) {
-            case 'votes':
+            case AssignmentPollmethods.Votes:
                 return this.translate.instant('One vote per candidate');
-            case 'yna':
+            case AssignmentPollmethods.YN:
                 return this.translate.instant('Yes/No/Abstain per candidate');
-            case 'yn':
+            case AssignmentPollmethods.YNA:
                 return this.translate.instant('Yes/No per candidate');
             default:
                 return '';
@@ -115,9 +93,12 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         titleService: Title,
         matSnackBar: MatSnackBar,
         private operator: OperatorService,
+        private formBuilder: FormBuilder,
         public translate: TranslateService,
         public dialog: MatDialog,
-        private pdfService: AssignmentPollPdfService
+        private pdfService: AssignmentPollPdfService,
+        private promptService: PromptService,
+        private repo: AssignmentPollRepositoryService
     ) {
         super(titleService, translate, matSnackBar);
     }
@@ -128,22 +109,20 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
     public ngOnInit(): void {
         /*this.majorityChoice =
             this.pollService.majorityMethods.find(method => method.value === this.pollService.defaultMajorityMethod) ||
-            null;
+            null;*/
         this.descriptionForm = this.formBuilder.group({
             description: this.poll ? this.poll.description : ''
-        });*/
+        });
     }
 
     /**
      * Handler for the 'delete poll' button
-     *
-     * TODO: Some confirmation (advanced logic (e.g. not deleting published?))
      */
     public async onDeletePoll(): Promise<void> {
-        /*const title = this.translate.instant('Are you sure you want to delete this ballot?');
+        const title = this.translate.instant('Are you sure you want to delete this poll?');
         if (await this.promptService.open(title)) {
-            await this.assignmentRepo.deletePoll(this.poll).catch(this.raiseError);
-        }*/
+            await this.repo.delete(this.poll).catch(this.raiseError);
+        }
     }
 
     /**
@@ -151,7 +130,8 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
      *
      */
     public printBallot(): void {
-        this.pdfService.printBallots(this.poll);
+        throw new Error("TODO");
+        // this.pdfService.printBallots(this.poll);
     }
 
     /**
@@ -187,15 +167,6 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
                 this.assignmentRepo.updateVotes(result, this.poll).catch(this.raiseError);
             }
         });*/
-    }
-
-    /**
-     * Updates the majority method for this poll
-     *
-     * @param method the selected majority method
-     */
-    public setMajority(method: MajorityMethod): void {
-        this.majorityChoice = method;
     }
 
     /**

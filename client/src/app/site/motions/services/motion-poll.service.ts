@@ -6,20 +6,10 @@ import { ConstantsService } from 'app/core/core-services/constants.service';
 import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
 import { ConfigService } from 'app/core/ui-services/config.service';
 import { CalculablePollKey, PollMajorityMethod, PollService } from 'app/core/ui-services/poll.service';
-import { MotionPoll, MotionPollMethods, MotionPollMethodsVerbose } from 'app/shared/models/motions/motion-poll';
-import {
-    MajorityMethod,
-    MajorityMethodVerbose,
-    PercentBase,
-    PercentBaseVerbose,
-    PollPropertyVerbose,
-    PollType,
-    PollTypeVerbose
-} from 'app/shared/models/poll/base-poll';
-
-interface KeyValue {
-    [key: string]: string;
-}
+import { MotionPoll, MotionPollMethods } from 'app/shared/models/motions/motion-poll';
+import { MotionPollMethodsVerbose } from 'app/site/motions/models/view-motion-poll';
+import { PollType } from 'app/shared/models/poll/base-poll';
+import { MajorityMethodVerbose, PercentBaseVerbose, PollTypeVerbose, PollPropertyVerbose } from 'app/site/polls/models/view-base-poll';
 
 /**
  * Service class for motion polls.
@@ -182,38 +172,6 @@ export class MotionPollService extends PollService {
             return true;
         }
         return false;
-    }
-
-    public getPollType(): typeof PollType {
-        return PollType;
-    }
-
-    public getPollTypeVerbose(): KeyValue {
-        return PollTypeVerbose;
-    }
-
-    public getMajorityMethod(): typeof MajorityMethod {
-        return MajorityMethod;
-    }
-
-    public getMajorityMethodVerbose(): KeyValue {
-        return MajorityMethodVerbose;
-    }
-
-    public getPercentBase(): typeof PercentBase {
-        return PercentBase;
-    }
-
-    public getPercentBaseVerbose(): KeyValue {
-        return PercentBaseVerbose;
-    }
-
-    public getMotionPollMethods(): typeof MotionPollMethods {
-        return MotionPollMethods;
-    }
-
-    public getMotionPollMethodsVerbose(): KeyValue {
-        return MotionPollMethodsVerbose;
     }
 
     public getDefaultPollData(motionId: number): object {

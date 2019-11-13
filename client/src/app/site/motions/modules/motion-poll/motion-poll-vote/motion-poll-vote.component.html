@@ -1,0 +1,32 @@
+<ng-container *ngIf="poll" [ngSwitch]="vmanager.getVotePermissionErrors(poll)">
+    <ng-container *ngSwitchCase="null">
+        <div *ngIf="currentVote"><span translate>Your current vote is</span> '{{ currentVote.valueVerbose | translate }}'</div>
+        <div *ngIf="!currentVote" translate>You have not voted yet.</div>
+        <!-- Voting -->
+        <mat-radio-group
+            name="votes-{{ poll.id }}"
+            [(ngModel)]="selectedVote"
+        >
+            <mat-radio-button value="Y">
+                <span translate>Yes</span>
+            </mat-radio-button>
+            <mat-radio-button value="N">
+                <span translate>No</span>
+            </mat-radio-button>
+            <mat-radio-button value="A" *ngIf="poll.pollmethod === pollMethods.YNA">
+                <span translate>Abstain</span>
+            </mat-radio-button>
+        </mat-radio-group>
+        <button mat-button (click)="saveVote()">
+            <span translate>Save</span>
+        </button>
+    </ng-container>
+
+    <!-- Errors -->
+    <span *ngSwitchCase="votingErrors.POLL_WRONG_STATE" translate>You can't vote on this poll right now because it's not in the 'Started' state.</span>
+    <span *ngSwitchCase="votingErrors.POLL_WRONG_TYPE" translate>You can't vote on this poll because its type is set to analog voting.</span>
+    <span *ngSwitchCase="votingErrors.USER_HAS_NO_PERMISSION" translate>You don't have permission to vote on this poll.</span>
+    <span *ngSwitchCase="votingErrors.USER_IS_ANONYMOUS" translate>You have to be logged in to be able to vote.</span>
+    <span *ngSwitchCase="votingErrors.USER_NOT_PRESENT" translate>You have to be present to vote on a poll.</span>
+    <span *ngSwitchCase="votingErrors.USER_HAS_VOTED" translate>You have already voted on this poll. You can't change your vote in a pseudoanonymous poll.</span>
+</ng-container>

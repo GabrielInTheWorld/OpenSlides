@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CalculablePollKey, PollVoteValue } from 'app/core/ui-services/poll.service';
 import { ViewAssignmentOption } from '../../models/view-assignment-option';
 import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
+import { AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
 
 /**
  * Vote entries included once for summary (e.g. total votes cast)
@@ -52,13 +53,13 @@ export class AssignmentPollDialogComponent {
         @Inject(MAT_DIALOG_DATA) public data: ViewAssignmentPoll
     ) {
         switch (this.data.pollmethod) {
-            case 'votes':
+            case AssignmentPollmethods.Votes:
                 this.optionPollKeys = ['Votes'];
                 break;
-            case 'yn':
+            case AssignmentPollmethods.YN:
                 this.optionPollKeys = ['Yes', 'No'];
                 break;
-            case 'yna':
+            case AssignmentPollmethods.YNA:
                 this.optionPollKeys = ['Yes', 'No', 'Abstain'];
                 break;
         }

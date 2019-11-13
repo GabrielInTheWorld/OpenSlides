@@ -7,17 +7,17 @@
             </button>
         </span>
         <div class="poll-properties">
-            <mat-chip *ngIf="pollService.isElectronicVotingEnabled">{{ getMotionPollType() }}</mat-chip>
+            <mat-chip *ngIf="pollService.isElectronicVotingEnabled">{{ poll.typeVerbose }}</mat-chip>
             <mat-chip
                 class="poll-state active"
                 *ngIf="poll.state !== 2"
                 [matMenuTriggerFor]="triggerMenu"
-                [ngClass]="getMotionPollState().toLowerCase()"
+                [ngClass]="poll.stateVerbose.toLowerCase()"
             >
-                {{ getMotionPollState() }}
+                {{ poll.stateVerbose }}
             </mat-chip>
-            <mat-chip class="poll-state" *ngIf="poll.state === 2" [ngClass]="getMotionPollState().toLowerCase()">
-                {{ getMotionPollState() }}
+            <mat-chip class="poll-state" *ngIf="poll.state === 2" [ngClass]="poll.stateVerbose.toLowerCase()">
+                {{ poll.stateVerbose }}
             </mat-chip>
         </div>
     </div>

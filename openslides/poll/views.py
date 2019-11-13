@@ -1,4 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
+from django.db import transaction
+from rest_framework import status
 
 from openslides.utils.auth import in_some_groups
 from openslides.utils.autoupdate import inform_changed_data
@@ -28,6 +30,41 @@ class BasePollViewSet(ModelViewSet):
             return True
         else:
             return self.has_manage_permissions()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # for analog polls, votes can be given directly when the poll is created
+        # for assignment polls, the options do not exist yet, so the AssignmentRelatedUser ids are needed
+        if "votes" in request.data:
+            if serializer.validated_data["type"] != BasePoll.TYPE_ANALOG:
+                raise ValidationError(
+                    {"detail": "You cannot enter votes for a non-analog poll."}
+                )
+
+            with transaction.atomic():
+                vote_data = request.data["votes"]
+                poll = serializer.save()
+                poll.create_options()
+                # convert user ids to option ids
+                self.convert_option_data(poll, vote_data)
+
+                self.validate_vote_data(vote_data, poll)
+                self.handle_analog_vote(vote_data, poll, request.user)
+
+                if request.data.get("publish_immediately") == "1":
+                    poll.state = BasePoll.STATE_PUBLISHED
+                else:
+                    poll.state = BasePoll.STATE_FINISHED
+                poll.save()
+        else:
+            self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     def perform_create(self, serializer):
         poll = serializer.save()
@@ -94,6 +131,7 @@ class BasePollViewSet(ModelViewSet):
         poll.state = BasePoll.STATE_PUBLISHED
         poll.save()
         inform_changed_data(poll.get_votes())
+        inform_changed_data(poll.get_options())
         return Response()
 
     @detail_route(methods=["POST"])
@@ -135,60 +173,99 @@ class BasePollViewSet(ModelViewSet):
             self.permission_denied(request)
 
         # check permissions based on poll type and handle requests
+        self.assert_can_vote(poll, request)
+
+        data = request.data
+        self.validate_vote_data(data, poll)
+
         if poll.type == BasePoll.TYPE_ANALOG:
-            if not self.has_manage_permissions():
-                self.permission_denied(request)
-
-            if (
-                poll.state != BasePoll.STATE_STARTED
-                and poll.state != BasePoll.STATE_FINISHED
-            ):
-                raise ValidationError(
-                    {"detail": "You cannot vote for a poll in this state"}
-                )
-
-            self.handle_analog_vote(request.data, poll, request.user)
+            self.handle_analog_vote(data, poll, request.user)
             # special: change the poll state to finished.
             poll.state = BasePoll.STATE_FINISHED
             poll.save()
 
-        else:
-            if poll.state != BasePoll.STATE_STARTED:
-                raise ValidationError(
-                    {"detail": "You cannot vote for an unstarted poll"}
-                )
+        elif poll.type == BasePoll.TYPE_NAMED:
+            self.handle_named_vote(data, poll, request.user)
+            poll.voted.add(request.user)
 
-            if poll.type == BasePoll.TYPE_NAMED:
-                self.assert_can_vote(poll, request)
-                self.handle_named_vote(request.data, poll, request.user)
-                poll.voted.add(request.user)
-
-            elif poll.type == BasePoll.TYPE_PSEUDOANONYMOUS:
-                self.assert_can_vote(poll, request)
-
-                if request.user in poll.voted.all():
-                    self.permission_denied(request)
-                self.handle_pseudoanonymous_vote(request.data, poll)
-                poll.voted.add(request.user)
+        elif poll.type == BasePoll.TYPE_PSEUDOANONYMOUS:
+            self.handle_pseudoanonymous_vote(data, poll)
+            poll.voted.add(request.user)
 
         inform_changed_data(poll)  # needed for the changed voted relation
         return Response()
 
     def assert_can_vote(self, poll, request):
         """
-        Raises a permission denied, if the user is not in a poll group
-        and present
+        Raises a permission denied, if the user is not allowed to vote.
+        Analog:                     has to have manage permissions
+        Named & Pseudoanonymous:    has to be in a poll group and present
+        Only pseudoanonymous:       has to not have voted yet
         """
-        if not request.user.is_present or not in_some_groups(
-            request.user.id, poll.groups.all(), exact=True
-        ):
-            self.permission_denied(request)
+        if poll.type == BasePoll.TYPE_ANALOG:
+            if not self.has_manage_permissions():
+                self.permission_denied(request)
+        else:
+            if poll.state != BasePoll.STATE_STARTED:
+                raise ValidationError("You can only vote on a started poll.")
+            if not request.user.is_present or not in_some_groups(
+                request.user.id, poll.groups.all(), exact=True
+            ):
+                self.permission_denied(request)
 
-    def parse_decimal_value(self, value, min_value=None):
-        """ Raises a ValidationError on incorrect values """
-        field = DecimalField(min_value=min_value, max_digits=15, decimal_places=6)
-        return field.to_internal_value(value)
+            if poll.type == BasePoll.TYPE_PSEUDOANONYMOUS:
+                if request.user in poll.voted.all():
+                    self.permission_denied(request)
+
+    def parse_vote_value(self, obj, key):
+        """ Raises a ValidationError on incorrect values, including None """
+        if key not in obj:
+            raise ValidationError({"detail": f"The field {key} is required"})
+        field = DecimalField(min_value=-2, max_digits=15, decimal_places=6)
+        value = field.to_internal_value(obj[key])
+        if value < 0 and value != -1 and value != -2:
+            raise ValidationError(
+                {
+                    "detail": "No fractional negative values allowed, only the special values -1 and -2"
+                }
+            )
+        return value
+
+    def convert_option_data(self, poll, data):
+        """
+        May be overwritten by subclass. Adjusts the option data based on the now existing poll
+        """
+        pass
+
+    def validate_vote_data(self, data, poll):
+        """
+        To be implemented by subclass. Validates the data according to poll type and method and fields by validated versions.
+        Raises ValidationError on failure
+        """
+        raise NotImplementedError()
+
+    def handle_analog_vote(self, data, poll, user):
+        """
+        To be implemented by subclass. Handles the analog vote. Assumes data is validated
+        """
+        raise NotImplementedError()
+
+    def handle_named_vote(self, data, poll, user):
+        """
+        To be implemented by subclass. Handles the named vote. Assumes data is validated
+        """
+        raise NotImplementedError()
+
+    def handle_pseudoanonymous_vote(self, data, poll):
+        """
+        To be implemented by subclass. Handles the pseudoanonymous vote. Assumes data is validated
+        """
+        raise NotImplementedError()
 
 
 class BaseVoteViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+    pass
+
+
+class BaseOptionViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     pass

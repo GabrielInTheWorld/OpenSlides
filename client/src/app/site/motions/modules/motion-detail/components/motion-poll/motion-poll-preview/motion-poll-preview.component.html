@@ -16,9 +16,9 @@
             >
                 {{ poll.stateVerbose }}
             </mat-chip>
-            <mat-chip class="poll-state" *ngIf="poll.state === 2" [ngClass]="poll.stateVerbose.toLowerCase()">
+            <!--<mat-chip class="poll-state" *ngIf="poll.state === 2" [ngClass]="poll.stateVerbose.toLowerCase()">
                 {{ poll.stateVerbose }}
-            </mat-chip>
+            </mat-chip>-->
         </div>
     </div>
     <div class="poll-chart-wrapper" *ngIf="poll" (click)="openPoll()">

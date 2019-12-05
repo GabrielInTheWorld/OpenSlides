@@ -30,6 +30,12 @@ const MotionPollRelations: RelationDefinition[] = [
         ownIdKey: 'voted_id',
         ownKey: 'voted',
         foreignViewModel: ViewUser
+    },
+    {
+        type: 'O2M',
+        ownIdKey: 'options_id',
+        ownKey: 'options',
+        foreignViewModel: ViewMotionOption
     }
 ];
 

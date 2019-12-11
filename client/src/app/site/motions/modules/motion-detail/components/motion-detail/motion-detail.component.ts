@@ -72,6 +72,9 @@ import {
     MotionTitleChangeRecommendationDialogComponent,
     MotionTitleChangeRecommendationDialogComponentData
 } from '../motion-title-change-recommendation-dialog/motion-title-change-recommendation-dialog.component';
+import { MotionPollDialogComponent } from '../../../motion-poll/motion-poll-dialog/motion-poll-dialog.component';
+import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
+import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
 
 /**
  * Component for the motion detail view
@@ -452,7 +455,9 @@ export class MotionDetailComponent extends BaseViewComponent implements OnInit, 
         private motionSortService: MotionSortListService,
         private motionFilterService: MotionFilterListService,
         private routingStateService: RoutingStateService,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private pollRepo: MotionPollRepositoryService,
+        private motionPollService: MotionPollService,
     ) {
         super(title, translate, matSnackBar);
     }

@@ -13,6 +13,7 @@ import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { LocalPermissionsService } from 'app/site/motions/services/local-permissions.service';
 import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
 import { MotionPollDialogComponent } from '../../../../motion-poll/motion-poll-dialog/motion-poll-dialog.component';
+import { PollState } from 'app/shared/models/poll/base-poll';
 
 @Component({
     selector: 'os-motion-poll-manager',
@@ -27,13 +28,6 @@ export class MotionPollManagerComponent extends BaseViewComponent {
     public motion: ViewMotion;
 
     /**
-     * Gets all motion-polls related to the given motion.
-     */
-    public get polls(): ViewMotionPoll[] {
-        return this.motion ? this.motion.polls : [];
-    }
-
-    /**
      * Default constructor.
      */
     public constructor(
@@ -46,55 +40,37 @@ export class MotionPollManagerComponent extends BaseViewComponent {
         public perms: LocalPermissionsService
     ) {
         super(title, translate, matSnackbar);
-        pollRepo.getViewModelListObservable().subscribe(res => console.log(res, res[0] && res[0].options));
     }
 
     /**
-     * Opens the to enter votes and edit the meta-info for a motion-poll.
+     * Opens the dialog to enter votes and edit the meta-info for a motion-poll.
      *
-     * @param motionId The id of the related motion - number.
      * @param data Optional. Passing the data for the motion-poll, if existing - any.
      */
-    public openVoteDialog(motionId: number, data?: any): void {
+    public openDialog(poll?: ViewMotionPoll): void {
         const dialogRef = this.dialog.open(MotionPollDialogComponent, {
-            data: data ? data : this.service.getDefaultPollData(motionId),
+            data: poll ? poll : this.service.getDefaultPollData(this.motion.id),
             ...mediumDialogSettings
         });
         dialogRef.afterClosed().subscribe(async result => {
-            if (!result) {
-                return;
-            }
-            const poll = await this.savePoll(result.poll, data);
-            if (result.data) {
-                this.pollRepo.enterAnalogVote(poll.poll, result.data);
+            if (result) {
+                if (!poll) {
+                    this.pollRepo.create(result).catch(this.raiseError);
+                } else {
+                    let update = result;
+                    if (poll.state !== PollState.Created) {
+                        update = {
+                            title: result.title,
+                            onehundred_percent_base: result.onehundred_percent_base,
+                            majority_method: result.majority_method,
+                            description: result.description,
+                            votes: result.votes,
+                            publish_immediately: result.publish_immediately
+                        };
+                    }
+                    this.pollRepo.patch(update, poll).catch(this.raiseError);
+                }
             }
         });
-    }
-
-    /**
-     * Function to save changes for this poll.
-     *
-     * @param data The data to create or update the motion-poll.
-     * @param model Optional. The existing `ViewMotionPoll`, if it should be updated.
-     *
-     * @returns The created respectively updated `ViewMotionPoll`.
-     */
-    public async savePoll(data: any, model?: ViewMotionPoll): Promise<ViewMotionPoll> {
-        if (!model) {
-            const id = await this.pollRepo.create(data);
-            const poll = new MotionPoll(data);
-            poll.id = id.id;
-            poll.state = 1;
-            return new ViewMotionPoll(poll);
-        } else {
-            const update = {
-                // title: data.title,
-                onehundred_percent_base: data.onehundred_percent_base,
-                majority_method: data.majority_method
-            };
-            console.log('update', update);
-            await this.pollRepo.update(update, model);
-            return model;
-        }
     }
 }

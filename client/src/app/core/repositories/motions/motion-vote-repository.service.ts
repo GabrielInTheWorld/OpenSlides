@@ -14,6 +14,8 @@ import { ViewUser } from 'app/site/users/models/view-user';
 import { BaseRepository } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
+import { Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 
 const MotionVoteRelations: RelationDefinition[] = [
     {
@@ -75,10 +77,6 @@ export class MotionVoteRepositoryService extends BaseRepository<ViewMotionVote, 
     public getVerboseName = (plural: boolean = false) => {
         return this.translate.instant(plural ? 'Votes' : 'Vote');
     };
-
-    public getVotesForUser(pollId: number, userId: number): ViewMotionVote[] {
-        return this.getViewModelList().filter(vote => vote.option.poll_id === pollId && vote.user_id === userId);
-    }
 
     public sendVote(vote: 'Y' | 'N' | 'A', poll_id: number): Promise<void> {
         return this.http.post(`/rest/motions/motion-poll/${poll_id}/vote/`, JSON.stringify(vote));

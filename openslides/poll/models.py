@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from ..utils.autoupdate import inform_deleted_data
+from ..utils.autoupdate import inform_changed_data, inform_deleted_data
 from ..utils.models import SET_NULL_AND_AUTOUPDATE
 
 
@@ -242,6 +242,9 @@ class BasePoll(models.Model):
         votes.delete()
         collection = self.get_vote_class().get_collection_string()
         inform_deleted_data((collection, id) for id in votes_id)
+
+        # update options
+        inform_changed_data(self.get_options())
 
         # Reset state
         self.state = BasePoll.STATE_CREATED

@@ -1,6 +1,8 @@
 <div class="poll-preview-wrapper">
     <div class="poll-title-wrapper" *ngIf="poll">
-        <div class="poll-title">{{ poll.title }}</div>
+        <a class="poll-title" routerLink="/motions/polls/{{ poll.id }}">
+            {{ poll.title }}
+        </a>
         <span class="poll-title-actions">
             <button mat-icon-button (click)="edit.emit()">
                 <mat-icon class="small-icon">edit</mat-icon>
@@ -10,20 +12,30 @@
             <mat-chip *ngIf="pollService.isElectronicVotingEnabled">{{ poll.typeVerbose }}</mat-chip>
             <mat-chip
                 class="poll-state active"
-                *ngIf="poll.state !== 2"
                 [matMenuTriggerFor]="triggerMenu"
                 [ngClass]="poll.stateVerbose.toLowerCase()"
             >
                 {{ poll.stateVerbose }}
             </mat-chip>
-            <!--<mat-chip class="poll-state" *ngIf="poll.state === 2" [ngClass]="poll.stateVerbose.toLowerCase()">
+            <!-- <mat-chip
+                class="poll-state active"
+                *ngIf="poll.state !== 2"
+                [matMenuTriggerFor]="triggerMenu"
+                [ngClass]="poll.stateVerbose.toLowerCase()"
+            >
                 {{ poll.stateVerbose }}
-            </mat-chip>-->
+            </mat-chip> -->
+            <!-- <mat-chip class="poll-state" *ngIf="poll.state === 2" [ngClass]="poll.stateVerbose.toLowerCase()">
+                {{ poll.stateVerbose }}
+            </mat-chip> -->
         </div>
     </div>
-    <div class="poll-chart-wrapper" *ngIf="poll" (click)="openPoll()">
+    <div class="poll-chart-wrapper" *ngIf="poll">
         <ng-container *ngIf="poll.state === 3 || poll.state === 4" [ngTemplateOutlet]="viewTemplate"></ng-container>
-        <ng-container *ngIf="poll.state === 1 || poll.state === 2" [ngTemplateOutlet]="emptyTemplate"></ng-container>
+        <ng-container *ngIf="(poll.state === 1 || poll.state === 2) && poll.type === 'analog'" [ngTemplateOutlet]="emptyTemplate"></ng-container>
+        <ng-container *ngIf="(poll.state === 1 || poll.state === 2) && poll.type !== 'analog'">
+            <os-motion-poll-vote [poll]="poll"></os-motion-poll-vote>
+        </ng-container>
     </div>
     <div class="poll-preview-result-wrapper"></div>
 </div>
@@ -52,10 +64,10 @@
     <ng-container *ngIf="poll">
         <button
             mat-menu-item
-            (click)="state === 'Reset' ? pollRepo.resetPoll(poll) : pollRepo.changePollState(poll)"
-            *ngFor="let state of poll.nextStates"
+            (click)="state.key === 1 ? pollRepo.resetPoll(poll) : pollRepo.changePollState(poll)"
+            *ngFor="let state of poll.nextStates | keyvalue"
         >
-            <span translate>{{ state }}</span>
+            <span translate>{{ state.value }}</span>
         </button>
     </ng-container>
 </mat-menu>

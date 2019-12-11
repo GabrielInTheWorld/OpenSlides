@@ -13,6 +13,7 @@ import { ViewAssignmentVote } from 'app/site/assignments/models/view-assignment-
 import { BaseRepository } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
+import { ViewUser } from 'app/site/users/models/view-user';
 
 const AssignmentOptionRelations: RelationDefinition[] = [
     {
@@ -26,6 +27,12 @@ const AssignmentOptionRelations: RelationDefinition[] = [
         ownIdKey: 'poll_id',
         ownKey: 'poll',
         foreignViewModel: ViewAssignmentPoll
+    },
+    {
+        type: 'M2O',
+        ownIdKey: 'user_id',
+        ownKey: 'user',
+        foreignViewModel: ViewUser
     }
 ];
 

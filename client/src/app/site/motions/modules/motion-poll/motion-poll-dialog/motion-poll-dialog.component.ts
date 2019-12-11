@@ -81,7 +81,7 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
         public dialogRef: MatDialogRef<MotionPollDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: ViewMotionPoll,
+        @Inject(MAT_DIALOG_DATA) public data: Partial<ViewMotionPoll>,
         public pollService: MotionPollService,
         private fb: FormBuilder,
         private groupRepo: GroupRepositoryService
@@ -100,22 +100,15 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
     }
 
     /**
-     * Close the dialog, submitting nothing. Triggered by the cancel button and
-     * default angular cancelling behavior
-     */
-    public cancel(): void {
-        this.dialogRef.close();
-    }
-
-    /**
      * Submits the values from dialog.
      */
     public submitPoll(): void {
-        const notEmpty = !Object.values(this.dialogVoteForm.value).every(value => !value);
+        const empty = Object.values(this.dialogVoteForm.value).every(value => !value);
         const answer = {
-            poll: this.createEmptyPoll(),
-            data: notEmpty ? this.getDialogFormValue() : null,
-            publish: this.publishImmediately
+            ...this.contentForm.value,
+            motion_id: this.data.motion_id,
+            votes: !empty ? this.getDialogFormValue() : undefined,
+            publish_immediately: this.publishImmediately
         };
         this.dialogRef.close(answer);
     }
@@ -123,9 +116,9 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
     /**
      * Function to save changes for this poll.
      */
-    public createEmptyPoll(): ViewMotionPoll {
+    public createEmptyPoll(): Partial<ViewMotionPoll> {
         const pollValues = this.contentForm.value;
-        const poll: ViewMotionPoll = this.data;
+        const poll = this.data;
         Object.keys(pollValues).forEach(key => (poll[key] = pollValues[key]));
         return poll;
     }
@@ -199,7 +192,7 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
         }
     }
 
-    private updateDialogVoteForm(data: ViewMotionPoll): void {
+    private updateDialogVoteForm(data: Partial<ViewMotionPoll>): void {
         const update = {
             Y: data.options[0].yes,
             N: data.options[0].no,
@@ -213,8 +206,8 @@ export class MotionPollDialogComponent extends BaseViewComponent implements OnIn
         }
         if (this.dialogVoteForm) {
             Object.keys(this.dialogVoteForm.controls).forEach(key => {
-                if (update[key] === -2 || !update[key]) {
-                    return;
+                if (update[key] === -2) {
+                    update[key] = null;
                 }
                 this.dialogVoteForm.get(key).setValue(update[key]);
             });

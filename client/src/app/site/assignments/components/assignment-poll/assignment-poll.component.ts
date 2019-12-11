@@ -16,6 +16,8 @@ import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
 import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
 import { PromptService } from 'app/core/ui-services/prompt.service';
 import { AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
+import { filter } from 'rxjs/operators';
+import { AssignmentVoteRepositoryService } from 'app/core/repositories/assignments/assignment-vote-repository.service';
 
 /**
  * Component for a single assignment poll. Used in assignment detail view
@@ -89,6 +91,9 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         }
     }
 
+    private currentVotes = {};
+    private selectedVotes = {};
+
     public constructor(
         titleService: Title,
         matSnackBar: MatSnackBar,
@@ -98,21 +103,31 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         public dialog: MatDialog,
         private pdfService: AssignmentPollPdfService,
         private promptService: PromptService,
-        private repo: AssignmentPollRepositoryService
+        private repo: AssignmentPollRepositoryService,
+        private voteRepo: AssignmentVoteRepositoryService
     ) {
         super(titleService, translate, matSnackBar);
     }
 
-    /**
-     * Gets the currently selected majority choice option from the repo
-     */
-    public ngOnInit(): void {
+    public async ngOnInit(): Promise<void> {
         /*this.majorityChoice =
             this.pollService.majorityMethods.find(method => method.value === this.pollService.defaultMajorityMethod) ||
             null;*/
         this.descriptionForm = this.formBuilder.group({
             description: this.poll ? this.poll.description : ''
         });
+        for (let option of this.poll.options) {
+            this.currentVotes[option.id] = {};
+            this.selectedVotes[option.id] = {};
+        }
+        const user = await this.operator.getUserObservable().pipe(filter(x => !!x)).toPromise();
+        if (user && this.poll) {
+            const votes = this.voteRepo.getVotesForUser(this.poll.id, user.id);
+            for (let vote of votes) {
+                this.currentVotes[vote.option.id][vote.value] = vote.weight;
+                this.selectedVotes[vote.option.id][vote.value] = vote.weight;
+            }
+        }
     }
 
     /**

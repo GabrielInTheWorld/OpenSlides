@@ -115,18 +115,18 @@ export class MotionPollDetailComponent extends BaseViewComponent implements OnIn
      * Opens the dialog, so the user can enter votes.
      */
     public async enterVote(): Promise<void> {
-        const dialogRef = this.dialog.open(MotionPollDialogComponent, {
-            data: this.poll,
-            ...mediumDialogSettings
-        });
-        dialogRef.afterClosed().subscribe(async result => {
-            if (!result) {
-                return;
-            }
-            if (result.data) {
-                this.repo.enterAnalogVote(this.poll, result.data);
-            }
-        });
+        // const dialogRef = this.dialog.open(MotionPollDialogComponent, {
+        //     data: this.poll,
+        //     ...mediumDialogSettings
+        // });
+        // dialogRef.afterClosed().subscribe(async result => {
+        //     if (!result) {
+        //         return;
+        //     }
+        //     if (result.data) {
+        //         this.repo.enterAnalogVote(this.poll, result.data);
+        //     }
+        // });
     }
 
     /**

@@ -11,6 +11,7 @@ import { MotionPollMethods } from 'app/shared/models/motions/motion-poll';
 import { BaseViewComponent } from 'app/site/base/base-view';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { ViewMotionVote } from 'app/site/motions/models/view-motion-vote';
+import { ViewUser } from 'app/site/users/models/view-user';
 
 @Component({
     selector: 'os-motion-poll-vote',
@@ -29,6 +30,9 @@ export class MotionPollVoteComponent extends BaseViewComponent implements OnInit
     public pollMethods = MotionPollMethods;
     public votingErrors = VotingError;
 
+    private user: ViewUser;
+    private votes: ViewMotionVote[];
+
     public constructor(
         public vmanager: VotingService,
         title: Title,
@@ -42,17 +46,29 @@ export class MotionPollVoteComponent extends BaseViewComponent implements OnInit
 
     public ngOnInit(): void {
         this.subscriptions.push(
-            this.operator.getUserObservable().subscribe(user => {
-                if (user && this.poll && this.selectedVote === null) {
-                    const votes = this.voteRepo.getVotesForUser(this.poll.id, user.id);
-                    if (votes.length) {
-                        // max one vote should exist
-                        this.currentVote = votes[0];
-                        this.selectedVote = votes[0].value;
-                    }
-                }
+            this.operator.getViewUserObservable().subscribe(user => {
+                this.user = user;
+                this.updateVote();
+            }),
+            this.voteRepo.getViewModelListObservable().subscribe(votes => {
+                this.votes = votes;
+                this.updateVote();
             })
         );
+    }
+
+    private updateVote(): void {
+        if (this.user && this.votes && this.poll) {
+            const filtered = this.votes.filter(vote => vote.option.poll.id === this.poll.id && vote.user.id === this.user.id);
+            if (filtered.length) {
+                if (filtered.length > 1) {
+                    // output warning and continue to keep the error case user friendly
+                    console.error("A user should never have more than one vote on the same poll.");
+                }
+                this.currentVote = filtered[0];
+                this.selectedVote = filtered[0].value;
+            }
+        }
     }
 
     public saveVote(): void {

@@ -23,26 +23,21 @@ export class ViewMotionPoll extends ViewBasePoll<MotionPoll> implements MotionPo
     public readonly pollClassType: 'assignment' | 'motion' = 'motion';
 
     public generateChartData(): ChartData {
-        const model = this.poll;
-        const data: ChartData = [
-            ...Object.entries(this.options[0])
-                .filter(([key, value]) => {
-                    if (model.pollmethod === MotionPollMethods.YN) {
-                        return key.toLowerCase() !== 'abstain' && key.toLowerCase() !== 'id';
-                    }
-                    return key.toLowerCase() !== 'id';
-                })
-                .map(([key, value]) => ({
+        const fields = ["yes", "no"]
+        if (this.pollmethod == MotionPollMethods.YNA) {
+            fields.push("abstain");
+        }
+        const data: ChartData = fields
+                .map(key => ({
                     label: key.toUpperCase(),
-                    data: [value],
+                    data: [this.options[0][key]],
                     backgroundColor: PollColor[key],
                     hoverBackgroundColor: PollColor[key]
-                }))
-        ];
+                }));
 
         data.push({
             label: 'Votes invalid',
-            data: [model.votesinvalid],
+            data: [this.votesinvalid],
             backgroundColor: PollColor.votesinvalid,
             hoverBackgroundColor: PollColor.votesinvalid
         });

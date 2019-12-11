@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -13,6 +13,7 @@ import { BaseViewComponent } from 'app/site/base/base-view';
 import { ViewMotion } from 'app/site/motions/models/view-motion';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
+import { PollStateVerbose } from 'app/site/polls/models/view-base-poll';
 
 /**
  * Component to show an excerpt for a motion-poll.
@@ -78,6 +79,8 @@ export class MotionPollPreviewComponent extends BaseViewComponent {
      */
     private _poll: ViewMotionPoll;
 
+    public pollStates = PollStateVerbose;
+
     /**
      * Constructor.
      *
@@ -92,17 +95,9 @@ export class MotionPollPreviewComponent extends BaseViewComponent {
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
         private router: Router,
-        private motionRepo: MotionRepositoryService,
         public pollService: MotionPollService,
         public pollRepo: MotionPollRepositoryService
     ) {
         super(title, translate, matSnackbar);
-    }
-
-    /**
-     * Navigates the user to the poll-detail-view.
-     */
-    public openPoll(): void {
-        this.router.navigate(['motions', 'polls', this.poll.id]);
     }
 }

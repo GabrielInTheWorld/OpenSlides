@@ -19,7 +19,12 @@ from .models import BasePoll
 
 
 class BasePollViewSet(ModelViewSet):
-    valid_update_keys = ["majority_method", "onehundred_percent_base"]
+    valid_update_keys = [
+        "majority_method",
+        "onehundred_percent_base",
+        "title",
+        "description",
+    ]
 
     def check_view_permissions(self):
         """
@@ -31,6 +36,7 @@ class BasePollViewSet(ModelViewSet):
         else:
             return self.has_manage_permissions()
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -38,26 +44,9 @@ class BasePollViewSet(ModelViewSet):
         # for analog polls, votes can be given directly when the poll is created
         # for assignment polls, the options do not exist yet, so the AssignmentRelatedUser ids are needed
         if "votes" in request.data:
-            if serializer.validated_data["type"] != BasePoll.TYPE_ANALOG:
-                raise ValidationError(
-                    {"detail": "You cannot enter votes for a non-analog poll."}
-                )
-
-            with transaction.atomic():
-                vote_data = request.data["votes"]
-                poll = serializer.save()
-                poll.create_options()
-                # convert user ids to option ids
-                self.convert_option_data(poll, vote_data)
-
-                self.validate_vote_data(vote_data, poll)
-                self.handle_analog_vote(vote_data, poll, request.user)
-
-                if request.data.get("publish_immediately") == "1":
-                    poll.state = BasePoll.STATE_PUBLISHED
-                else:
-                    poll.state = BasePoll.STATE_FINISHED
-                poll.save()
+            poll = serializer.save()
+            poll.create_options()
+            self.handle_request_with_votes(request, poll)
         else:
             self.perform_create(serializer)
 
@@ -70,9 +59,10 @@ class BasePollViewSet(ModelViewSet):
         poll = serializer.save()
         poll.create_options()
 
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         """
-        Customized view endpoint to update a motion poll.
+        Customized view endpoint to update a poll.
         """
         poll = self.get_object()
 
@@ -87,11 +77,32 @@ class BasePollViewSet(ModelViewSet):
             if len(invalid_keys):
                 raise ValidationError(
                     {
-                        "detail": f"The poll is not in the created state. You can only edit: {', '.join(self.valid_update_keys)}"
+                        "detail": f"The poll is not in the created state. You can only edit: {', '.join(self.valid_update_keys)}. You provided the invalid keys: {', '.join(invalid_keys)}."
                     }
                 )
 
+        if "votes" in request.data:
+            self.handle_request_with_votes(request, poll)
         return super().update(request, *args, **kwargs)
+
+    def handle_request_with_votes(self, request, poll):
+        if poll.type != BasePoll.TYPE_ANALOG:
+            raise ValidationError(
+                {"detail": "You cannot enter votes for a non-analog poll."}
+            )
+
+        vote_data = request.data["votes"]
+        # convert user ids to option ids
+        self.convert_option_data(poll, vote_data)
+
+        self.validate_vote_data(vote_data, poll)
+        self.handle_analog_vote(vote_data, poll, request.user)
+
+        if request.data.get("publish_immediately") == True:
+            poll.state = BasePoll.STATE_PUBLISHED
+        else:
+            poll.state = BasePoll.STATE_FINISHED
+        poll.save()
 
     @detail_route(methods=["POST"])
     def start(self, request, pk):
@@ -180,8 +191,10 @@ class BasePollViewSet(ModelViewSet):
 
         if poll.type == BasePoll.TYPE_ANALOG:
             self.handle_analog_vote(data, poll, request.user)
-            # special: change the poll state to finished.
-            poll.state = BasePoll.STATE_FINISHED
+            if request.data.get("publish_immediately") == "1":
+                poll.state = BasePoll.STATE_PUBLISHED
+            else:
+                poll.state = BasePoll.STATE_FINISHED
             poll.save()
 
         elif poll.type == BasePoll.TYPE_NAMED:

@@ -73,4 +73,8 @@ export class AssignmentVoteRepositoryService extends BaseRepository<ViewAssignme
     public getVerboseName = (plural: boolean = false) => {
         return this.translate.instant(plural ? 'Votes' : 'Vote');
     };
+
+    public getVotesForUser(pollId: number, userId: number): ViewAssignmentVote[] {
+        return this.getViewModelList().filter(vote => vote.option.poll_id === pollId && vote.user_id === userId);
+    }
 }

@@ -1419,6 +1419,9 @@ class ResetMotionPoll(TestCase):
     def test_deleted_autoupdate(self):
         response = self.client.post(reverse("motionpoll-reset", args=[self.poll.pk]))
         self.assertHttpStatusVerbose(response, status.HTTP_200_OK)
+        poll = MotionPoll.objects.get()
+        option = poll.options.get()
+        self.assertAutoupdate(option, self.admin)
         for user in (self.admin, self.user1, self.user2):
             self.assertDeletedAutoupdate(self.vote1, user=user)
             self.assertDeletedAutoupdate(self.vote2, user=user)

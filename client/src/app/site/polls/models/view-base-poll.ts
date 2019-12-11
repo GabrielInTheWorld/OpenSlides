@@ -1,4 +1,4 @@
-import { BasePoll } from 'app/shared/models/poll/base-poll';
+import { BasePoll, PollState } from 'app/shared/models/poll/base-poll';
 import { ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-poll';
 import { BaseProjectableViewModel } from 'app/site/base/base-projectable-view-model';
 import { ProjectorElementBuildDeskriptor } from 'app/site/base/projectable';
@@ -28,10 +28,10 @@ export const PollTypeVerbose = {
 
 export const PollPropertyVerbose = {
     majority_method: 'Majority method',
-    onehundred_percent_base: '100%-base',
+    onehundred_percent_base: '100% base',
     type: 'Poll type',
     pollmethod: 'Poll method',
-    pollState: 'Poll state',
+    state: 'State',
     groups: 'Entitled to vote'
 };
 
@@ -85,6 +85,17 @@ export abstract class ViewBasePoll<M extends BasePoll<M, any> = any> extends Bas
 
     public get percentBaseVerbose(): string {
         return PercentBaseVerbose[this.onehundred_percent_base];
+    }
+
+    public get nextStates(): { [key: number]: string } {
+        const state = this.state % Object.keys(PollStateVerbose).length + 1;
+        const states = {
+            state: PollStateVerbose[state]
+        }
+        if (this.state === PollState.Finished) {
+            states[PollState.Created] = PollStateVerbose[PollState.Created];
+        }
+        return states;
     }
 }
 

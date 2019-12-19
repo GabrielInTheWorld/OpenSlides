@@ -13,9 +13,7 @@ import { SharedModule } from '../../shared/shared.module';
     declarations: [
         AssignmentListComponent,
         AssignmentDetailComponent,
-        AssignmentPollComponent,
-        AssignmentPollDialogComponent
+        AssignmentPollComponent
     ],
-    entryComponents: [AssignmentPollDialogComponent]
 })
 export class AssignmentsModule {}

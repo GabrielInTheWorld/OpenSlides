@@ -115,6 +115,10 @@ import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.componen
 import { ChartsComponent } from './components/charts/charts.component';
 import { CheckInputComponent } from './components/check-input/check-input.component';
 import { BannerComponent } from './components/banner/banner.component';
+import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
+import { PollFormComponent } from 'app/site/polls/components/poll-form/poll-form.component';
+import { MotionPollDialogComponent } from 'app/site/motions/modules/motion-poll/motion-poll-dialog/motion-poll-dialog.component';
+import { AssignmentPollDialogComponent } from 'app/site/assignments/components/assignment-poll-dialog/assignment-poll-dialog.component';
 
 /**
  * Share Module for all "dumb" components and pipes.
@@ -272,7 +276,10 @@ import { BannerComponent } from './components/banner/banner.component';
         BreadcrumbComponent,
         ChartsComponent,
         CheckInputComponent,
-        BannerComponent
+        BannerComponent,
+        PollFormComponent,
+        MotionPollDialogComponent,
+        AssignmentPollDialogComponent
     ],
     declarations: [
         PermsDirective,
@@ -323,7 +330,10 @@ import { BannerComponent } from './components/banner/banner.component';
         BreadcrumbComponent,
         ChartsComponent,
         CheckInputComponent,
-        BannerComponent
+        BannerComponent,
+        PollFormComponent,
+        MotionPollDialogComponent,
+        AssignmentPollDialogComponent
     ],
     providers: [
         {
@@ -348,7 +358,9 @@ import { BannerComponent } from './components/banner/banner.component';
         ChoiceDialogComponent,
         ProjectionDialogComponent,
         ProgressSnackBarComponent,
-        SuperSearchComponent
+        SuperSearchComponent,
+        MotionPollDialogComponent,
+        AssignmentPollDialogComponent
     ]
 })
 export class SharedModule {}

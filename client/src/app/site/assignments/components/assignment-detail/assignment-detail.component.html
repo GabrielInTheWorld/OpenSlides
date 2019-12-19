@@ -67,9 +67,9 @@
         <ng-container [ngTemplateOutlet]="metaInfoTemplate"></ng-container>
         <!-- votable polls -->
         <ng-container *ngIf="assignment">
-            <ng-container *ngFor="let poll of assignment.polls">
+            <ng-container *ngFor="let poll of assignment.polls; trackBy: trackByIndex">
                 <mat-card class="os-card" *ngIf="poll.canBeVotedFor">
-                    <os-assignment-poll [assignment]="assignment" [poll]="poll"> </os-assignment-poll>
+                    <os-assignment-poll [poll]="poll"> </os-assignment-poll>
                 </mat-card>
             </ng-container>
         </ng-container>
@@ -77,9 +77,9 @@
         <ng-container [ngTemplateOutlet]="candidatesTemplate"></ng-container>
         <!-- closed polls -->
         <ng-container *ngIf="assignment">
-            <ng-container *ngFor="let poll of assignment.polls">
+            <ng-container *ngFor="let poll of assignment.polls; trackBy: trackByIndex">
                 <mat-card class="os-card" *ngIf="!poll.canBeVotedFor">
-                    <os-assignment-poll [assignment]="assignment" [poll]="poll"> </os-assignment-poll>
+                    <os-assignment-poll [poll]="poll"> </os-assignment-poll>
                 </mat-card>
             </ng-container>
         </ng-container>
@@ -200,7 +200,7 @@
                 </div>
             </div>
             <div class="ballot-button" *ngIf="assignment && hasPerms('createPoll')">
-                <button mat-button (click)="createPoll()">
+                <button mat-button (click)="openDialog()">
                     <mat-icon color="primary">poll</mat-icon>
                     <span translate>New ballot</span>
                 </button>

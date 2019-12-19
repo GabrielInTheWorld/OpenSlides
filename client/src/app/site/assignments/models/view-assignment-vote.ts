@@ -12,7 +12,7 @@ export class ViewAssignmentVote extends BaseViewModel<AssignmentVote> {
 }
 
 interface TIAssignmentVoteRelations {
-    user?: ViewUser;
+    user: ViewUser;
     option: ViewAssignmentOption;
 }
 

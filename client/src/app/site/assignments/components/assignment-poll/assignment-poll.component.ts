@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
@@ -7,7 +7,7 @@ import { Title } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 
 import { OperatorService } from 'app/core/core-services/operator.service';
-import { CalculablePollKey, MajorityMethod } from 'app/core/ui-services/poll.service';
+import { CalculablePollKey, CalculableMajorityMethod } from 'app/site/polls/services/poll.service';
 import { BaseViewComponent } from 'app/site/base/base-view';
 import { AssignmentPollPdfService } from '../../services/assignment-poll-pdf.service';
 import { ViewAssignment } from '../../models/view-assignment';
@@ -15,9 +15,12 @@ import { ViewAssignmentOption } from '../../models/view-assignment-option';
 import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
 import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
 import { PromptService } from 'app/core/ui-services/prompt.service';
-import { AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
+import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
 import { filter } from 'rxjs/operators';
 import { AssignmentVoteRepositoryService } from 'app/core/repositories/assignments/assignment-vote-repository.service';
+import { AssignmentVote } from 'app/shared/models/assignments/assignment-vote';
+import { ViewUser } from 'app/site/users/models/view-user';
+import { ViewAssignmentVote } from '../../models/view-assignment-vote';
 
 /**
  * Component for a single assignment poll. Used in assignment detail view
@@ -29,12 +32,6 @@ import { AssignmentVoteRepositoryService } from 'app/core/repositories/assignmen
     encapsulation: ViewEncapsulation.None
 })
 export class AssignmentPollComponent extends BaseViewComponent implements OnInit {
-    /**
-     * The related assignment (used for metainfos, e.g. related user names)
-     */
-    @Input()
-    public assignment: ViewAssignment;
-
     /**
      * The poll represented in this component
      */
@@ -67,32 +64,13 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         return this.descriptionForm.get('description').value !== this.poll.description;
     }
 
-    /**
-     * Gets the translated poll method name
-     *
-     * TODO: check/improve text here
-     *
-     * @returns a name for the poll method this poll is set to (which is determined
-     * by the number of candidates and config settings).
-     */
-    public get pollMethodName(): string {
-        if (!this.poll) {
-            return '';
-        }
-        switch (this.poll.pollmethod) {
-            case AssignmentPollmethods.Votes:
-                return this.translate.instant('One vote per candidate');
-            case AssignmentPollmethods.YN:
-                return this.translate.instant('Yes/No/Abstain per candidate');
-            case AssignmentPollmethods.YNA:
-                return this.translate.instant('Yes/No per candidate');
-            default:
-                return '';
-        }
-    }
+    /** holds the currently saved votes */
+    private currentVotes: { [key: number]: string | number | null } = {};
 
-    private currentVotes = {};
-    private selectedVotes = {};
+    private votes: ViewAssignmentVote[];
+    private user: ViewUser;
+
+    public voteForm: FormGroup;
 
     public constructor(
         titleService: Title,
@@ -109,25 +87,50 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         super(titleService, translate, matSnackBar);
     }
 
-    public async ngOnInit(): Promise<void> {
+    public ngOnInit(): void {
         /*this.majorityChoice =
             this.pollService.majorityMethods.find(method => method.value === this.pollService.defaultMajorityMethod) ||
             null;*/
         this.descriptionForm = this.formBuilder.group({
             description: this.poll ? this.poll.description : ''
         });
-        for (let option of this.poll.options) {
-            this.currentVotes[option.id] = {};
-            this.selectedVotes[option.id] = {};
-        }
-        const user = await this.operator.getUserObservable().pipe(filter(x => !!x)).toPromise();
-        if (user && this.poll) {
-            const votes = this.voteRepo.getVotesForUser(this.poll.id, user.id);
-            for (let vote of votes) {
-                this.currentVotes[vote.option.id][vote.value] = vote.weight;
-                this.selectedVotes[vote.option.id][vote.value] = vote.weight;
+        this.subscriptions.push(
+            this.operator.getViewUserObservable().subscribe(user => {
+                this.user = user;
+                this.updateVotes();
+            }),
+            this.voteRepo.getViewModelListObservable().subscribe(votes => {
+                this.votes = votes;
+                this.updateVotes();
+            })
+        );
+    }
+
+    private updateVotes(): void {
+        if (this.user && this.votes && this.poll) {
+            const filtered = this.votes.filter(
+                vote => vote.option.poll.id === this.poll.id && vote.user.id === this.user.id
+            );
+            this.voteForm = this.formBuilder.group(
+                this.poll.options.reduce((obj, option) => {
+                    obj[option.id] = ['', [Validators.required]];
+                    return obj;
+                }, {})
+            );
+            for (let option of this.poll.options) {
+                let vote = filtered.find(vote => vote.option.id === option.id);
+                this.currentVotes[option.id] = vote
+                    ? this.poll.pollmethod === AssignmentPollMethods.Votes
+                        ? vote.weight
+                        : vote.value
+                    : null;
+                this.voteForm.get(option.id.toString()).setValue(this.currentVotes[option.id]);
             }
         }
+    }
+
+    public saveVotes(): void {
+        this.repo.vote(this.voteForm.value, this.poll.id).catch(this.raiseError);
     }
 
     /**
@@ -145,7 +148,7 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
      *
      */
     public printBallot(): void {
-        throw new Error("TODO");
+        throw new Error('TODO');
         // this.pdfService.printBallots(this.poll);
     }
 

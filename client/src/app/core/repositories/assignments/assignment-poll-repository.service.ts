@@ -18,6 +18,8 @@ import { ViewUser } from 'app/site/users/models/view-user';
 import { NestedModelDescriptors } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
+import { ViewAssignment } from 'app/site/assignments/models/view-assignment';
+import { HttpService } from 'app/core/core-services/http.service';
 
 const AssignmentPollRelations: RelationDefinition[] = [
     {
@@ -37,8 +39,29 @@ const AssignmentPollRelations: RelationDefinition[] = [
         ownIdKey: 'options_id',
         ownKey: 'options',
         foreignViewModel: ViewAssignmentOption
+    },
+    {
+        type: 'M2O',
+        ownIdKey: 'assignment_id',
+        ownKey: 'assignment',
+        foreignViewModel: ViewAssignment
     }
 ];
+
+export interface AssignmentAnalogVoteData {
+    options: {
+        [key: number]: {
+            Y: number;
+            N?: number;
+            A?: number;
+        };
+    };
+    votesvalid?: number;
+    votesinvalid?: number;
+    votescast?: number;
+    global_no?: number;
+    global_abstain?: number;
+}
 
 /**
  * Repository Service for Assignments.
@@ -70,7 +93,8 @@ export class AssignmentPollRepositoryService extends BasePollRepositoryService<
         viewModelStoreService: ViewModelStoreService,
         translate: TranslateService,
         relationManager: RelationManagerService,
-        votingService: VotingService
+        votingService: VotingService,
+        http: HttpService
     ) {
         super(
             DS,
@@ -82,7 +106,8 @@ export class AssignmentPollRepositoryService extends BasePollRepositoryService<
             AssignmentPoll,
             AssignmentPollRelations,
             {},
-            votingService
+            votingService,
+            http
         );
     }
 
@@ -93,4 +118,8 @@ export class AssignmentPollRepositoryService extends BasePollRepositoryService<
     public getVerboseName = (plural: boolean = false) => {
         return this.translate.instant(plural ? 'Polls' : 'Poll');
     };
+
+    public vote(data: any, poll_id: number): Promise<void> {
+        return this.http.post(`/rest/assignments/assignment-poll/${poll_id}/vote/`, data);
+    }
 }

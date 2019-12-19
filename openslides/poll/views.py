@@ -86,6 +86,7 @@ class BasePollViewSet(ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def handle_request_with_votes(self, request, poll):
+        print(poll, poll.type, BasePoll.TYPE_ANALOG)
         if poll.type != BasePoll.TYPE_ANALOG:
             raise ValidationError(
                 {"detail": "You cannot enter votes for a non-analog poll."}
@@ -100,7 +101,7 @@ class BasePollViewSet(ModelViewSet):
 
         if request.data.get("publish_immediately") == True:
             poll.state = BasePoll.STATE_PUBLISHED
-        else:
+        elif poll.state != BasePoll.STATE_PUBLISHED: # only set to finished if not already published
             poll.state = BasePoll.STATE_FINISHED
         poll.save()
 

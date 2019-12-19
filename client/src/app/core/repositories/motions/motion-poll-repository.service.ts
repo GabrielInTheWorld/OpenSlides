@@ -9,7 +9,6 @@ import { ViewModelStoreService } from 'app/core/core-services/view-model-store.s
 import { RelationDefinition } from 'app/core/definitions/relations';
 import { VotingService } from 'app/core/ui-services/voting.service';
 import { MotionPoll } from 'app/shared/models/motions/motion-poll';
-import { PollState } from 'app/shared/models/poll/base-poll';
 import { ViewMotionOption } from 'app/site/motions/models/view-motion-option';
 import { MotionPollTitleInformation, ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { BasePollRepositoryService } from 'app/site/polls/services/base-poll-repository.service';
@@ -53,14 +52,14 @@ export class MotionPollRepositoryService extends BasePollRepositoryService<
     MotionPollTitleInformation
 > {
     public constructor(
-        private http: HttpService,
         DS: DataStoreService,
         dataSend: DataSendService,
         mapperService: CollectionStringMapperService,
         viewModelStoreService: ViewModelStoreService,
         translate: TranslateService,
         relationManager: RelationManagerService,
-        votingService: VotingService
+        votingService: VotingService,
+        http: HttpService
     ) {
         super(
             DS,
@@ -72,7 +71,8 @@ export class MotionPollRepositoryService extends BasePollRepositoryService<
             MotionPoll,
             MotionPollRelations,
             {},
-            votingService
+            votingService,
+            http
         );
     }
 
@@ -84,25 +84,7 @@ export class MotionPollRepositoryService extends BasePollRepositoryService<
         return this.translate.instant(plural ? 'Polls' : 'Poll');
     };
 
-    public changePollState(poll: ViewMotionPoll): Promise<void> {
-        const path = this.restPath(poll);
-        switch (poll.state) {
-            case PollState.Created:
-                return this.http.post(`${path}/start/`);
-            case PollState.Started:
-                return this.http.post(`${path}/stop/`);
-            case PollState.Finished:
-                return this.http.post(`${path}/publish/`);
-            case PollState.Published:
-                return this.resetPoll(poll);
-        }
-    }
-
-    public resetPoll(poll: MotionPoll | ViewMotionPoll): Promise<void> {
-        return this.http.post(`${this.restPath(poll)}/reset/`);
-    }
-
-    private restPath(poll: MotionPoll | ViewMotionPoll): string {
-        return `/rest/${poll.collectionString}/${poll.id}`;
+    public vote(vote: 'Y' | 'N' | 'A', poll_id: number): Promise<void> {
+        return this.http.post(`/rest/motions/motion-poll/${poll_id}/vote/`, JSON.stringify(vote));
     }
 }

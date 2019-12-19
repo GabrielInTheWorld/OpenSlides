@@ -1,15 +1,21 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { CalculablePollKey, PollVoteValue } from 'app/core/ui-services/poll.service';
+import { CalculablePollKey, PollVoteValue } from 'app/site/polls/services/poll.service';
 import { ViewAssignmentOption } from '../../models/view-assignment-option';
 import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
-import { AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
+import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
+import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material';
+import { TranslateService } from '@ngx-translate/core';
+import { Title } from '@angular/platform-browser';
+import { ViewUser } from 'app/site/users/models/view-user';
+import { VoteValue, VoteValueVerbose } from 'app/shared/models/poll/base-vote';
+import { AssignmentPollMethodsVerbose } from 'app/site/assignments/models/view-assignment-poll';
+import { PollFormComponent } from 'app/site/polls/components/poll-form/poll-form.component';
 
-/**
- * Vote entries included once for summary (e.g. total votes cast)
- */
-type summaryPollKey = 'votescast' | 'votesvalid' | 'votesinvalid' | 'votesno' | 'votesabstain';
+type OptionsObject = { id: number, user: ViewUser }[];
 
 /**
  * A dialog for updating the values of an assignment-related poll.
@@ -19,13 +25,13 @@ type summaryPollKey = 'votescast' | 'votesvalid' | 'votesinvalid' | 'votesno' | 
     templateUrl: './assignment-poll-dialog.component.html',
     styleUrls: ['./assignment-poll-dialog.component.scss']
 })
-export class AssignmentPollDialogComponent {
+export class AssignmentPollDialogComponent extends PollDialogComponent implements OnInit {
     /**
      * The summary values that will have fields in the dialog
      */
-    public get sumValues(): summaryPollKey[] {
-        const generalValues: summaryPollKey[] = ['votesvalid', 'votesinvalid', 'votescast'];
-        if (this.data.pollmethod === 'votes') {
+    public get sumValues() {
+        const generalValues = ['votesvalid', 'votesinvalid', 'votescast'];
+        if (this.pollData.pollmethod === 'votes') {
             return ['votesno', 'votesabstain', ...generalValues];
         } else {
             return generalValues;
@@ -38,39 +44,115 @@ export class AssignmentPollDialogComponent {
      */
     public specialValues: [number, string][];
 
+    @ViewChild('pollForm', { static: true })
+    protected pollForm: PollFormComponent;
+
     /**
      * vote entries for each option in this component. Is empty if method
      * requires one vote per candidate
      */
-    public optionPollKeys: PollVoteValue[];
+    public analogPollValues: VoteValue[];
+
+    public voteValueVerbose = VoteValueVerbose;
+
+    public assignmentPollMethods = AssignmentPollMethodsVerbose;
+
+    public options: OptionsObject;
 
     /**
      * Constructor. Retrieves necessary metadata from the pollService,
      * injects the poll itself
      */
     public constructor(
-        public dialogRef: MatDialogRef<AssignmentPollDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: ViewAssignmentPoll
+        private fb: FormBuilder,
+        title: Title,
+        protected translate: TranslateService,
+        matSnackbar: MatSnackBar,
+        public dialogRef: MatDialogRef<PollDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) public pollData: Partial<ViewAssignmentPoll>
     ) {
-        switch (this.data.pollmethod) {
-            case AssignmentPollmethods.Votes:
-                this.optionPollKeys = ['Votes'];
-                break;
-            case AssignmentPollmethods.YN:
-                this.optionPollKeys = ['Yes', 'No'];
-                break;
-            case AssignmentPollmethods.YNA:
-                this.optionPollKeys = ['Yes', 'No', 'Abstain'];
-                break;
+        super(title, translate, matSnackbar, dialogRef);
+
+        this.options = pollData.options ? pollData.options : pollData.assignment.candidates.map(user => ({
+            id: user.id,
+            user: user
+        }), {});
+    }
+
+    public ngOnInit(): void {
+        this.setAnalogPollValues();
+        this.createDialog();
+
+        this.subscriptions.push(
+            this.pollForm.contentForm.get("pollmethod").valueChanges.subscribe(() => {
+                this.setAnalogPollValues();
+                this.createDialog();
+            })
+        );
+    }
+
+    public getVoteData(): object {
+        const empty = Object.values(this.dialogVoteForm.value).every(value => !value);
+        console.log(this.dialogVoteForm.value, empty);
+        if (empty) {
+            return undefined;
+        }
+        const result = {}, value = this.dialogVoteForm.value;
+        for (const key of Object.keys(value)) {
+            if (typeof value[key] === "object") {
+                result[key] = 
+            }
+            result[key] = !!value[key] ? value[key] : -2;
+        }
+        return { options: result };
+    }
+
+    private replaceEmptyValues(object: object): void {
+        const result = {};
+        for (const key of Object.keys(object)) {
+            if (typeof object[key] === "object") {
+                result[key] = this.replaceEmptyValues
+            }
+            result[key] = !!object[key] ? object[key] : -2;
+        }
+
+    }
+
+    private setAnalogPollValues(): void {
+        const pollmethod = this.pollForm.contentForm.get('pollmethod').value;
+        this.analogPollValues = ['Y'];
+        if (pollmethod !== AssignmentPollMethods.Votes) {
+            this.analogPollValues.push('N');
+        }
+        if (pollmethod === AssignmentPollMethods.YNA) {
+            this.analogPollValues.push('A');
         }
     }
 
     /**
-     * Close the dialog, submitting nothing. Triggered by the cancel button and
-     * default angular cancelling behavior
+     * Pre-executed method to initialize the dialog-form depending on the poll-method.
      */
-    public cancel(): void {
-        this.dialogRef.close();
+    private createDialog(): void {
+        this.dialogVoteForm = this.fb.group({
+            options: this.fb.group(
+                this.options.reduce((aggr, option) => {
+                    aggr[option.id] = this.fb.group(
+                        this.analogPollValues.reduce((aggr, value) => {
+                            aggr[value] = ['', [Validators.min(-2)]];
+                            return aggr;
+                        }, {})
+                    );
+                    return aggr;
+                }, {})
+            ),
+            votesvalid: ['', [Validators.min(-2)]],
+            votesinvalid: ['', [Validators.min(-2)]],
+            votescast: ['', [Validators.min(-2)]]
+        });
+        console.log(this.dialogVoteForm.controls);
+        // if (this.pollData.poll) {
+        //     this.updateDialogVoteForm(this.pollData);
+        // }
     }
 
     /**
@@ -159,10 +241,10 @@ export class AssignmentPollDialogComponent {
      * @param weight
      */
     public setSumValue(value: any /*SummaryPollKey*/, weight: string): void {
-        this.data[value] = parseFloat(weight);
+        this.pollData[value] = parseFloat(weight);
     }
 
     public getGridClass(): string {
-        return `votes-grid-${this.optionPollKeys.length}`;
+        return `votes-grid-${this.analogPollValues.length}`;
     }
 }

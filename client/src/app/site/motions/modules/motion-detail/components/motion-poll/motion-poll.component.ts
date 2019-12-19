@@ -5,7 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 
 import { ConstantsService } from 'app/core/core-services/constants.service';
-import { CalculablePollKey } from 'app/core/ui-services/poll.service';
+import { CalculablePollKey } from 'app/site/polls/services/poll.service';
 import { MotionPoll } from 'app/shared/models/motions/motion-poll';
 import { BaseViewComponent } from 'app/site/base/base-view';
 import { LocalPermissionsService } from 'app/site/motions/services/local-permissions.service';
@@ -61,7 +61,8 @@ export class MotionPollComponent extends BaseViewComponent implements OnInit {
      * @returns the number required to be reached for a vote to match the quorum
      */
     public get yesQuorum(): number {
-        return this.pollService.calculateQuorum(this.poll, this.majorityChoice);
+        // return this.pollService.calculateQuorum(this.poll, this.majorityChoice);
+        return 0;
     }
 
     /**
@@ -70,7 +71,8 @@ export class MotionPollComponent extends BaseViewComponent implements OnInit {
      * @returns true if abstract (no calculations possible)
      */
     public get abstractPoll(): boolean {
-        return this.pollService.getBaseAmount(this.poll) <= 0;
+        // return this.pollService.getBaseAmount(this.poll) <= 0;
+        return false;
     }
 
     /**
@@ -164,7 +166,8 @@ export class MotionPollComponent extends BaseViewComponent implements OnInit {
      * @returns if the value cannot be calculated
      */
     public isAbstractValue(key: CalculablePollKey): boolean {
-        return this.pollService.isAbstractValue(this.poll, key);
+        // return this.pollService.isAbstractValue(this.poll, key);
+        return false;
     }
 
     /**
@@ -174,7 +177,8 @@ export class MotionPollComponent extends BaseViewComponent implements OnInit {
      * @returns a number with two digits, 100.00 representing 100 percent. May be null if the value cannot be calulated
      */
     public getPercent(value: CalculablePollKey): number {
-        return this.pollService.calculatePercentage(this.poll, value);
+        // return this.pollService.calculatePercentage(this.poll, value);
+        return 0;
     }
 
     /**

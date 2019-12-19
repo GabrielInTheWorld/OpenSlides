@@ -495,6 +495,7 @@ class AssignmentPollViewSet(BasePollViewSet):
                 if not isinstance(data, dict):
                     raise ValidationError({"detail": "Data must be a dict."})
                 for option_id, value in data.items():
+                    print(option_id, value)
                     if not is_int(option_id):
                         raise ValidationError({"detail": "Keys must be int"})
                     if (

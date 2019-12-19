@@ -12,8 +12,8 @@ import { ViewMotion } from 'app/site/motions/models/view-motion';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { LocalPermissionsService } from 'app/site/motions/services/local-permissions.service';
 import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
-import { MotionPollDialogComponent } from '../../../../motion-poll/motion-poll-dialog/motion-poll-dialog.component';
 import { PollState } from 'app/shared/models/poll/base-poll';
+import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
 
 @Component({
     selector: 'os-motion-poll-manager',
@@ -34,43 +34,9 @@ export class MotionPollManagerComponent extends BaseViewComponent {
         title: Title,
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
-        private pollRepo: MotionPollRepositoryService,
-        private service: MotionPollService,
-        private dialog: MatDialog,
-        public perms: LocalPermissionsService
+        public perms: LocalPermissionsService,
+        public pollDialog: PollDialogComponent
     ) {
         super(title, translate, matSnackbar);
-    }
-
-    /**
-     * Opens the dialog to enter votes and edit the meta-info for a motion-poll.
-     *
-     * @param data Optional. Passing the data for the motion-poll, if existing - any.
-     */
-    public openDialog(poll?: ViewMotionPoll): void {
-        const dialogRef = this.dialog.open(MotionPollDialogComponent, {
-            data: poll ? poll : this.service.getDefaultPollData(this.motion.id),
-            ...mediumDialogSettings
-        });
-        dialogRef.afterClosed().subscribe(async result => {
-            if (result) {
-                if (!poll) {
-                    this.pollRepo.create(result).catch(this.raiseError);
-                } else {
-                    let update = result;
-                    if (poll.state !== PollState.Created) {
-                        update = {
-                            title: result.title,
-                            onehundred_percent_base: result.onehundred_percent_base,
-                            majority_method: result.majority_method,
-                            description: result.description,
-                            votes: result.votes,
-                            publish_immediately: result.publish_immediately
-                        };
-                    }
-                    this.pollRepo.patch(update, poll).catch(this.raiseError);
-                }
-            }
-        });
     }
 }

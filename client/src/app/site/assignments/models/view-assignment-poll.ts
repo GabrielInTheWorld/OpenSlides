@@ -1,13 +1,18 @@
-import { AssignmentPoll, AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
+import { AssignmentPoll } from 'app/shared/models/assignments/assignment-poll';
 import { ProjectorElementBuildDeskriptor } from 'app/site/base/projectable';
 import { ViewBasePoll } from 'app/site/polls/models/view-base-poll';
-import { ViewGroup } from 'app/site/users/models/view-group';
-import { ViewUser } from 'app/site/users/models/view-user';
+import { ViewAssignment } from './view-assignment';
 import { ViewAssignmentOption } from './view-assignment-option';
 
 export interface AssignmentPollTitleInformation {
     title: string;
 }
+
+export const AssignmentPollMethodsVerbose = {
+    votes: 'Fixed Amount of votes for all candidates',
+    YN: 'Yes/No per candidate',
+    YNA: 'Yes/No/Abstain per candidate'
+};
 
 export class ViewAssignmentPoll extends ViewBasePoll<AssignmentPoll> implements AssignmentPollTitleInformation {
     public static COLLECTIONSTRING = AssignmentPoll.COLLECTIONSTRING;
@@ -29,8 +34,13 @@ export class ViewAssignmentPoll extends ViewBasePoll<AssignmentPoll> implements 
             getDialogTitle: () => 'TODO'
         };
     }
+
+    public get pollmethodVerbose(): string {
+        return AssignmentPollMethodsVerbose[this.pollmethod];
+    }
 }
 
 export interface ViewAssignmentPoll extends AssignmentPoll {
     options: ViewAssignmentOption[];
+    assignment: ViewAssignment;
 }

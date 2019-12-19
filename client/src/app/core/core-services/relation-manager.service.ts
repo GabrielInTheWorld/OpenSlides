@@ -190,7 +190,8 @@ export class RelationManagerService {
                 // try to find a getter for property
                 if (property in target) {
                     // iterate over prototype chain
-                    let prototypeFunc = viewModelCtor, descriptor = null;
+                    let prototypeFunc = viewModelCtor,
+                        descriptor = null;
                     do {
                         descriptor = Object.getOwnPropertyDescriptor(prototypeFunc.prototype, property);
                         if (!descriptor || !descriptor.get) {

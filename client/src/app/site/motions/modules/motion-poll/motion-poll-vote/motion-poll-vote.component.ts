@@ -12,6 +12,7 @@ import { BaseViewComponent } from 'app/site/base/base-view';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { ViewMotionVote } from 'app/site/motions/models/view-motion-vote';
 import { ViewUser } from 'app/site/users/models/view-user';
+import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
 
 @Component({
     selector: 'os-motion-poll-vote',
@@ -39,6 +40,7 @@ export class MotionPollVoteComponent extends BaseViewComponent implements OnInit
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
         private voteRepo: MotionVoteRepositoryService,
+        private pollRepo: MotionPollRepositoryService,
         private operator: OperatorService
     ) {
         super(title, translate, matSnackbar);
@@ -59,11 +61,13 @@ export class MotionPollVoteComponent extends BaseViewComponent implements OnInit
 
     private updateVote(): void {
         if (this.user && this.votes && this.poll) {
-            const filtered = this.votes.filter(vote => vote.option.poll.id === this.poll.id && vote.user.id === this.user.id);
+            const filtered = this.votes.filter(
+                vote => vote.option.poll.id === this.poll.id && vote.user.id === this.user.id
+            );
             if (filtered.length) {
                 if (filtered.length > 1) {
                     // output warning and continue to keep the error case user friendly
-                    console.error("A user should never have more than one vote on the same poll.");
+                    console.error('A user should never have more than one vote on the same poll.');
                 }
                 this.currentVote = filtered[0];
                 this.selectedVote = filtered[0].value;
@@ -73,7 +77,7 @@ export class MotionPollVoteComponent extends BaseViewComponent implements OnInit
 
     public saveVote(): void {
         if (this.selectedVote) {
-            this.voteRepo.sendVote(this.selectedVote, this.poll.id).catch(this.raiseError);
+            this.pollRepo.vote(this.selectedVote, this.poll.id).catch(this.raiseError);
         }
     }
 }

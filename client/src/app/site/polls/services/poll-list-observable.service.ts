@@ -33,7 +33,7 @@ export class PollListObservableService implements HasViewModelListObservable<Vie
 
     private adjustViewModelListObservable(polls: ViewBasePoll[], mode: 'motion' | 'assignment'): void {
         this[mode + 'Polls'] = polls;
-        
+
         const allPolls = (this.motionPolls as ViewBasePoll[]).concat(this.assignmentPolls);
         this.viewPollListSubject.next(allPolls);
     }

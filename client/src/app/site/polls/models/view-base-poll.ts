@@ -3,10 +3,8 @@ import { ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-
 import { BaseProjectableViewModel } from 'app/site/base/base-projectable-view-model';
 import { ProjectorElementBuildDeskriptor } from 'app/site/base/projectable';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
-import { ViewAssignmentOption } from 'app/site/assignments/models/view-assignment-option';
-import { ViewMotionOption } from 'app/site/motions/models/view-motion-option';
-import { ViewUser } from 'app/site/users/models/view-user';
 import { ViewGroup } from 'app/site/users/models/view-group';
+import { ViewUser } from 'app/site/users/models/view-user';
 
 export const PollClassTypeVerbose = {
     motion: 'Motion poll',
@@ -51,11 +49,6 @@ export const PercentBaseVerbose = {
 };
 
 export abstract class ViewBasePoll<M extends BasePoll<M, any> = any> extends BaseProjectableViewModel<M> {
-    public abstract readonly pollClassType: 'motion' | 'assignment';
-
-    public abstract getSlide(): ProjectorElementBuildDeskriptor;
-
-    public canBeVotedFor: () => boolean;
 
     public get poll(): M {
         return this._model;
@@ -88,15 +81,20 @@ export abstract class ViewBasePoll<M extends BasePoll<M, any> = any> extends Bas
     }
 
     public get nextStates(): { [key: number]: string } {
-        const state = this.state % Object.keys(PollStateVerbose).length + 1;
+        const state = (this.state % Object.keys(PollStateVerbose).length) + 1;
         const states = {
             state: PollStateVerbose[state]
-        }
+        };
         if (this.state === PollState.Finished) {
             states[PollState.Created] = PollStateVerbose[PollState.Created];
         }
         return states;
     }
+    public abstract readonly pollClassType: 'motion' | 'assignment';
+
+    public canBeVotedFor: () => boolean;
+
+    public abstract getSlide(): ProjectorElementBuildDeskriptor;
 }
 
 export interface ViewBasePoll<M extends BasePoll<M, any> = any> extends BasePoll<M, any> {

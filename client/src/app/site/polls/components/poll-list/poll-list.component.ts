@@ -47,6 +47,6 @@ export class PollListComponent extends BaseListViewComponent<ViewBasePoll> {
         translate: TranslateService,
         snackbar: MatSnackBar
     ) {
-        super(title, translate, snackbar, storage)
+        super(title, translate, snackbar, storage);
     }
 }

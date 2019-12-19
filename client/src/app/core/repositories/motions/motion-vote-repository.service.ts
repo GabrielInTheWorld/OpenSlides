@@ -77,8 +77,4 @@ export class MotionVoteRepositoryService extends BaseRepository<ViewMotionVote, 
     public getVerboseName = (plural: boolean = false) => {
         return this.translate.instant(plural ? 'Votes' : 'Vote');
     };
-
-    public sendVote(vote: 'Y' | 'N' | 'A', poll_id: number): Promise<void> {
-        return this.http.post(`/rest/motions/motion-poll/${poll_id}/vote/`, JSON.stringify(vote));
-    }
 }

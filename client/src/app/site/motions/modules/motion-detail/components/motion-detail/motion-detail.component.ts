@@ -72,9 +72,11 @@ import {
     MotionTitleChangeRecommendationDialogComponent,
     MotionTitleChangeRecommendationDialogComponentData
 } from '../motion-title-change-recommendation-dialog/motion-title-change-recommendation-dialog.component';
-import { MotionPollDialogComponent } from '../../../motion-poll/motion-poll-dialog/motion-poll-dialog.component';
 import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
 import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
+import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
+import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
+import { MotionPollDialogService } from 'app/site/motions/services/motion-poll-dialog.service';
 
 /**
  * Component for the motion detail view
@@ -456,8 +458,7 @@ export class MotionDetailComponent extends BaseViewComponent implements OnInit, 
         private motionFilterService: MotionFilterListService,
         private routingStateService: RoutingStateService,
         private cd: ChangeDetectorRef,
-        private pollRepo: MotionPollRepositoryService,
-        private motionPollService: MotionPollService,
+        private pollDialog: MotionPollDialogService
     ) {
         super(title, translate, matSnackBar);
     }
@@ -1609,5 +1610,13 @@ export class MotionDetailComponent extends BaseViewComponent implements OnInit, 
 
     public removeFromAgenda(): void {
         this.itemRepo.removeFromAgenda(this.motion.item).catch(this.raiseError);
+    }
+
+    public openDialog(poll?: ViewMotionPoll): void {
+        this.pollDialog.openDialog(
+            poll
+                ? poll
+                : { collectionString: ViewMotionPoll.COLLECTIONSTRING, motion_id: this.motion.id }
+        );
     }
 }

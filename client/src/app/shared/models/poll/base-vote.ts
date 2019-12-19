@@ -1,5 +1,7 @@
 import { BaseDecimalModel } from '../base/base-decimal-model';
 
+export type VoteValue = "Y" | "N" | "A";
+
 export const VoteValueVerbose = {
     Y: 'Yes',
     N: 'No',
@@ -8,7 +10,7 @@ export const VoteValueVerbose = {
 
 export abstract class BaseVote<T> extends BaseDecimalModel<T> {
     public weight: number;
-    public value: 'Y' | 'N' | 'A';
+    public value: VoteValue;
     public option_id: number;
     public user_id?: number;
 

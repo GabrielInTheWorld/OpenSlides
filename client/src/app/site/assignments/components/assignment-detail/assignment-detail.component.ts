@@ -26,7 +26,9 @@ import { AssignmentPhases, ViewAssignment } from '../../models/view-assignment';
 import { ViewAssignmentRelatedUser } from '../../models/view-assignment-related-user';
 import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
 import { BasePoll, PercentBase, MajorityMethod, PollType } from 'app/shared/models/poll/base-poll';
-import { AssignmentPollmethods } from 'app/shared/models/assignments/assignment-poll';
+import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
+import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
+import { AssignmentPollDialogService } from '../../services/assignment-poll-dialog.service';
 
 /**
  * Component for the assignment detail view
@@ -177,7 +179,8 @@ export class AssignmentDetailComponent extends BaseViewComponent implements OnIn
         private tagRepo: TagRepositoryService,
         private promptService: PromptService,
         private pdfService: AssignmentPdfExportService,
-        private mediafileRepo: MediafileRepositoryService
+        private mediafileRepo: MediafileRepositoryService,
+        private pollDialog: AssignmentPollDialogService
     ) {
         super(title, translate, matSnackBar);
         this.subscriptions.push(
@@ -306,15 +309,8 @@ export class AssignmentDetailComponent extends BaseViewComponent implements OnIn
     /**
      * Creates a new Poll
      */
-    public async createPoll(): Promise<void> {
-        await this.pollRepo.create(<any>{
-            assignment_id: this.assignment.id,
-            pollmethod: "YN",
-            onehundred_percent_base: PercentBase.YN,
-            majority_method: MajorityMethod.Simple,
-            type: PollType.Named,
-            title: "test"
-        }).catch(this.raiseError);
+    public openDialog(): void {
+        this.pollDialog.openDialog({ collectionString: ViewAssignmentPoll.COLLECTIONSTRING, assignment_id: this.assignment.id, assignment: this.assignment });
     }
 
     /**

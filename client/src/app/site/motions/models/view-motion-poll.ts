@@ -1,11 +1,9 @@
 import { ChartData } from 'app/shared/components/charts/charts.component';
 import { MotionPoll, MotionPollMethods } from 'app/shared/models/motions/motion-poll';
-import { PollColor, PollState } from 'app/shared/models/poll/base-poll';
+import { PollColor } from 'app/shared/models/poll/base-poll';
 import { ProjectorElementBuildDeskriptor } from 'app/site/base/projectable';
 import { ViewMotionOption } from 'app/site/motions/models/view-motion-option';
 import { ViewBasePoll } from 'app/site/polls/models/view-base-poll';
-import { ViewGroup } from 'app/site/users/models/view-group';
-import { ViewUser } from 'app/site/users/models/view-user';
 
 export interface MotionPollTitleInformation {
     title: string;
@@ -23,17 +21,16 @@ export class ViewMotionPoll extends ViewBasePoll<MotionPoll> implements MotionPo
     public readonly pollClassType: 'assignment' | 'motion' = 'motion';
 
     public generateChartData(): ChartData {
-        const fields = ["yes", "no"]
+        const fields = ['yes', 'no'];
         if (this.pollmethod == MotionPollMethods.YNA) {
-            fields.push("abstain");
+            fields.push('abstain');
         }
-        const data: ChartData = fields
-                .map(key => ({
-                    label: key.toUpperCase(),
-                    data: [this.options[0][key]],
-                    backgroundColor: PollColor[key],
-                    hoverBackgroundColor: PollColor[key]
-                }));
+        const data: ChartData = fields.map(key => ({
+            label: key.toUpperCase(),
+            data: [this.options[0][key]],
+            backgroundColor: PollColor[key],
+            hoverBackgroundColor: PollColor[key]
+        }));
 
         data.push({
             label: 'Votes invalid',

@@ -18,7 +18,6 @@ import { mediumDialogSettings } from 'app/shared/utils/dialog-settings';
 import { BaseViewComponent } from 'app/site/base/base-view';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { ViewGroup } from 'app/site/users/models/view-group';
-import { MotionPollDialogComponent } from '../motion-poll-dialog/motion-poll-dialog.component';
 
 @Component({
     selector: 'os-motion-poll-detail',

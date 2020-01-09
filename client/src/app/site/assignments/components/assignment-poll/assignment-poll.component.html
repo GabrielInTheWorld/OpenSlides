@@ -62,7 +62,11 @@
         </mat-chip> -->
     </div>
 
-    <h3>{{ poll.title }}</h3>
+    <h3>
+        <a routerLink="/assignments/polls/{{ poll.id }}">
+            {{ poll.title }}
+        </a>
+    </h3>
     <os-assignment-poll-vote *ngIf="poll.canBeVotedFor" [poll]="poll"></os-assignment-poll-vote>
     <!-- <ng-container *ngIf="poll.state === pollStates.STATE_PUBLISHED" [ngTemplateOutlet]="resultsTemplate"></ng-container> -->
 

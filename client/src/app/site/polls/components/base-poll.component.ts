@@ -1,20 +1,16 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
 
 import { TranslateService } from '@ngx-translate/core';
 
-import { OperatorService } from 'app/core/core-services/operator.service';
-import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
-import { AssignmentVoteRepositoryService } from 'app/core/repositories/assignments/assignment-vote-repository.service';
+import { BasePollDialogService } from 'app/core/ui-services/base-poll-dialog.service';
 import { PromptService } from 'app/core/ui-services/prompt.service';
 import { PollState } from 'app/shared/models/poll/base-poll';
 import { BaseViewComponent } from 'app/site/base/base-view';
-import { ViewBasePoll } from '../models/view-base-poll';
 import { BasePollRepositoryService } from '../services/base-poll-repository.service';
-import { BasePollDialogService } from 'app/core/ui-services/base-poll-dialog.service';
+import { ViewBasePoll } from '../models/view-base-poll';
 
 export class BasePollComponent<V extends ViewBasePoll> extends BaseViewComponent {
     /**
@@ -36,7 +32,7 @@ export class BasePollComponent<V extends ViewBasePoll> extends BaseViewComponent
     }
 
     public changeState(key: PollState): void {
-        key == PollState.Created ? this.repo.resetPoll(this.poll) : this.repo.changePollState(this.poll);
+        key === PollState.Created ? this.repo.resetPoll(this.poll) : this.repo.changePollState(this.poll);
     }
 
     /**

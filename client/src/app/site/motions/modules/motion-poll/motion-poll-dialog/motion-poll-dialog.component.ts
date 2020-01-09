@@ -35,10 +35,9 @@ export class MotionPollDialogComponent extends BasePollDialogComponent {
     }
 
     private updateDialogVoteForm(data: Partial<ViewMotionPoll>): void {
-        const update = {
+        const update: any = {
             Y: data.options[0].yes,
             N: data.options[0].no,
-            A: null,
             votesvalid: data.votesvalid,
             votesinvalid: data.votesinvalid,
             votescast: data.votescast

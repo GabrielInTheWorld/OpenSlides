@@ -1,16 +1,17 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { Component, Input } from '@angular/core';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { Title } from '@angular/platform-browser';
 
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
+import { PromptService } from 'app/core/ui-services/prompt.service';
 import { ChartData } from 'app/shared/components/charts/charts.component';
-import { BaseViewComponent } from 'app/site/base/base-view';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
-import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
-import { PollStateVerbose } from 'app/site/polls/models/view-base-poll';
+import { MotionPollDialogService } from 'app/site/motions/services/motion-poll-dialog.service';
+import { BasePollComponent } from 'app/site/polls/components/base-poll.component';
+import { PollService } from 'app/site/polls/services/poll.service';
 
 /**
  * Component to show a motion-poll.
@@ -20,9 +21,10 @@ import { PollStateVerbose } from 'app/site/polls/models/view-base-poll';
     templateUrl: './motion-poll.component.html',
     styleUrls: ['./motion-poll.component.scss']
 })
-export class MotionPollComponent extends BaseViewComponent {
+export class MotionPollComponent extends BasePollComponent<ViewMotionPoll> {
     /**
      * The dedicated `ViewMotionPoll`.
+     * TODO: shadows superclass `poll`. Maybe change when chart data is generated?
      */
     @Input()
     public set poll(value: ViewMotionPoll) {
@@ -45,18 +47,6 @@ export class MotionPollComponent extends BaseViewComponent {
     }
 
     /**
-     * The id of the dedicated motion.
-     */
-    @Input()
-    public motionId: number;
-
-    /**
-     * Emits, when the user clicks the 'edit'-button.
-     */
-    @Output()
-    public edit = new EventEmitter<void>();
-
-    /**
      * Subject to holding the data needed for the chart.
      */
     public chartDataSubject: BehaviorSubject<ChartData> = new BehaviorSubject([]);
@@ -76,8 +66,6 @@ export class MotionPollComponent extends BaseViewComponent {
      */
     private _poll: ViewMotionPoll;
 
-    public pollStates = PollStateVerbose;
-
     /**
      * Constructor.
      *
@@ -88,12 +76,15 @@ export class MotionPollComponent extends BaseViewComponent {
      * @param motionRepo
      */
     public constructor(
-        title: Title,
-        protected translate: TranslateService,
-        matSnackbar: MatSnackBar,
-        public pollService: MotionPollService,
-        public pollRepo: MotionPollRepositoryService
+        titleService: Title,
+        matSnackBar: MatSnackBar,
+        translate: TranslateService,
+        dialog: MatDialog,
+        promptService: PromptService,
+        repo: MotionPollRepositoryService,
+        pollDialog: MotionPollDialogService,
+        public pollService: PollService
     ) {
-        super(title, translate, matSnackbar);
+        super(titleService, matSnackBar, translate, dialog, promptService, repo, pollDialog);
     }
 }

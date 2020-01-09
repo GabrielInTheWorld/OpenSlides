@@ -80,7 +80,7 @@ export abstract class BasePollDialogComponent extends BaseViewComponent {
     private replaceEmptyValues(voteData: object, undo: boolean = false): object {
         const result = {};
         for (const key of Object.keys(voteData)) {
-            if (typeof voteData[key] === 'object') {
+            if (typeof voteData[key] === 'object' && voteData[key]) {
                 result[key] = this.replaceEmptyValues(voteData[key], undo);
             } else {
                 if (undo) {

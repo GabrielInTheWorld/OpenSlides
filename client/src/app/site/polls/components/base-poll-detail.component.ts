@@ -124,7 +124,7 @@ export class BasePollDetailComponent extends BaseViewComponent implements OnInit
      */
     private checkData(): void {
         if (this.poll.state === 3 || this.poll.state === 4) {
-            this.chartDataSubject.next(this.poll.generateChartData());
+            setTimeout(() => this.chartDataSubject.next(this.poll.generateChartData()));
         }
     }
 

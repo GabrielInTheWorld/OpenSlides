@@ -4,7 +4,6 @@
     [hasMainButton]="poll ? poll.state === 2 || poll.state === 3 : false"
     [mainButtonIcon]="'bar_chart'"
     [mainActionTooltip]="'Enter votes' | translate"
-    (mainEvent)="enterVote()"
 >
     <div class="title-slot">
         <h2 *ngIf="!!poll">{{ poll.title }}</h2>
@@ -49,7 +48,13 @@
                     </mat-select>
                 </mat-form-field>
             </div>
-            <os-charts [type]="chartType" [labels]="labels" [showLegend]="true" [data]="chartDataSubject"></os-charts>
+            <os-charts
+                *ngIf="chartDataSubject.value"
+                [type]="chartType"
+                [labels]="labels"
+                [showLegend]="true"
+                [data]="chartDataSubject"
+            ></os-charts>
         </div>
     </ng-container>
 </ng-template>

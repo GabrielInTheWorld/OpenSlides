@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
+import { Title } from '@angular/platform-browser';
 
+import { TranslateService } from '@ngx-translate/core';
 import { PblColumnDefinition } from '@pebula/ngrid';
 
+import { StorageService } from 'app/core/core-services/storage.service';
 import { VotingService } from 'app/core/ui-services/voting.service';
+import { BaseListViewComponent } from 'app/site/base/base-list-view';
 import { PollFilterListService } from '../../services/poll-filter-list.service';
 import { PollListObservableService } from '../../services/poll-list-observable.service';
-import { BaseListViewComponent } from 'app/site/base/base-list-view';
 import { ViewBasePoll } from '../../models/view-base-poll';
-import { Title } from '@angular/platform-browser';
-import { TranslateService } from '@ngx-translate/core';
-import { MatSnackBar } from '@angular/material';
-import { StorageService } from 'app/core/core-services/storage.service';
 
 @Component({
     selector: 'os-poll-list',

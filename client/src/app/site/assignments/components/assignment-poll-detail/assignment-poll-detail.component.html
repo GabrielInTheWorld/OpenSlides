@@ -1,7 +1,7 @@
 <os-head-bar
     [goBack]="true"
     [nav]="false"
-    [hasMainButton]="poll ? poll.state === 2 || poll.state === 3 : false"
+    [hasMainButton]="poll ? poll.type === 'analog' && (poll.state === 2 || poll.state === 3) : false"
     [mainButtonIcon]="'bar_chart'"
     [mainActionTooltip]="'Enter votes' | translate"
     (mainEvent)="enterVote()"

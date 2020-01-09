@@ -1,29 +1,26 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { Title } from '@angular/platform-browser';
-import { Router } from '@angular/router';
 
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
-import { MotionRepositoryService } from 'app/core/repositories/motions/motion-repository.service';
 import { ChartData } from 'app/shared/components/charts/charts.component';
 import { BaseViewComponent } from 'app/site/base/base-view';
-import { ViewMotion } from 'app/site/motions/models/view-motion';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
 import { PollStateVerbose } from 'app/site/polls/models/view-base-poll';
 
 /**
- * Component to show an excerpt for a motion-poll.
+ * Component to show a motion-poll.
  */
 @Component({
-    selector: 'os-motion-poll-preview',
-    templateUrl: './motion-poll-preview.component.html',
-    styleUrls: ['./motion-poll-preview.component.scss']
+    selector: 'os-motion-poll',
+    templateUrl: './motion-poll.component.html',
+    styleUrls: ['./motion-poll.component.scss']
 })
-export class MotionPollPreviewComponent extends BaseViewComponent {
+export class MotionPollComponent extends BaseViewComponent {
     /**
      * The dedicated `ViewMotionPoll`.
      */
@@ -94,7 +91,6 @@ export class MotionPollPreviewComponent extends BaseViewComponent {
         title: Title,
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
-        private router: Router,
         public pollService: MotionPollService,
         public pollRepo: MotionPollRepositoryService
     ) {

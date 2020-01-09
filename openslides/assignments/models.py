@@ -381,14 +381,11 @@ class AssignmentPoll(RESTModelMixin, BasePoll):
         related_users = AssignmentRelatedUser.objects.filter(
             assignment__id=self.assignment.id
         ).exclude(elected=True)
-        options = [
-            AssignmentOption(
+
+        for related_user in related_users:
+            AssignmentOption.objects.create(
                 user=related_user.user, weight=related_user.weight, poll=self
             )
-            for related_user in related_users
-        ]
-        AssignmentOption.objects.bulk_create(options)
-        inform_changed_data(self)
 
         # Add all candidates to list of speakers of related agenda item
         if config["assignment_poll_add_candidates_to_list_of_speakers"]:

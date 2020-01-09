@@ -11,13 +11,13 @@
         </button>
         <mat-menu #pollItemMenu="matMenu">
             <div *osPerms="'assignments.can_manage'">
+                <button mat-menu-item (click)="openDialog()">
+                    <mat-icon>edit</mat-icon>
+                    <span translate>Edit</span>
+                </button>
                 <button mat-menu-item (click)="printBallot()">
                     <mat-icon>local_printshop</mat-icon>
                     <span translate>Print ballot paper</span>
-                </button>
-                <button mat-menu-item *ngIf="!poll.assignment.isFinished" (click)="enterVotes()">
-                    <mat-icon>edit</mat-icon>
-                    <span translate>Enter votes</span>
                 </button>
                 <button mat-menu-item (click)="togglePublished()">
                     <mat-icon>
@@ -63,7 +63,7 @@
     </div>
 
     <h3>{{ poll.title }}</h3>
-    <ng-container *ngIf="poll.canBeVotedFor" [ngTemplateOutlet]="votingTemplate"></ng-container>
+    <os-assignment-poll-vote *ngIf="poll.canBeVotedFor" [poll]="poll"></os-assignment-poll-vote>
     <!-- <ng-container *ngIf="poll.state === pollStates.STATE_PUBLISHED" [ngTemplateOutlet]="resultsTemplate"></ng-container> -->
 
     <div class="poll-main-content" *ngIf="false && poll.options">
@@ -227,49 +227,10 @@
     <ng-container *ngIf="poll">
         <button
             mat-menu-item
-            (click)="state.key === 1 ? repo.resetPoll(poll) : repo.changePollState(poll)"
+            (click)="changeState(state.value)"
             *ngFor="let state of poll.nextStates | keyvalue"
         >
-            <span translate>{{ state.value }}</span>
+            <span translate>{{ state.key }}</span>
         </button>
     </ng-container>
 </mat-menu>
-
-<ng-template #votingTemplate>
-    <!-- <div *ngFor="let option of poll.options">
-        {{ option }}{{option.id}}{{ option.user.getFullName() }}
-    </div> -->
-    <form [formGroup]="voteForm">
-        <div *ngFor="let option of poll.options" class="voting-grid">
-            <div>
-                <span *ngIf="option.user">{{ option.user.getFullName() }}</span>
-                <span *ngIf="!option.user">No user {{ option.candidate_id }}</span>
-            </div>
-            
-            <mat-radio-group
-                name="votes-{{ poll.id }}-{{ option.id }}"
-                [formControlName]="option.id"
-                *ngIf="poll.pollmethod !== 'votes'"
-            >
-                <mat-radio-button value="Y">
-                    <span translate>Yes</span>
-                </mat-radio-button>
-                <mat-radio-button value="N">
-                    <span translate>No</span>
-                </mat-radio-button>
-                <mat-radio-button value="A" *ngIf="poll.pollmethod === 'YNA'">
-                    <span translate>Abstain</span>
-                </mat-radio-button>
-            </mat-radio-group>
-
-            <mat-form-field *ngIf="poll.pollmethod === 'votes'" class="vote-input">
-                <input matInput type="number" min="0" [formControlName]="option.id">
-            </mat-form-field>
-        </div>
-    </form>
-    <div class="right-align">
-        <button mat-button mat-button-default (click)="saveVotes()" [disabled]="voteForm.invalid">
-            <span translate>Save</span>
-        </button>
-    </div>
-</ng-template>

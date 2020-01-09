@@ -1,53 +1,37 @@
-import { Component, Input, ViewChild, Inject } from '@angular/core';
-import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
-import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
-import { Validators, FormGroup, FormBuilder } from '@angular/forms';
-import { MotionPollMethodsVerbose } from 'app/site/motions/models/view-motion-poll';
-import { OneOfValidator } from 'app/shared/validators/one-of-validator';
-import { MatDialogRef, MatSnackBar, MAT_DIALOG_DATA } from '@angular/material';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, Inject, ViewChild } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef, MatSnackBar } from '@angular/material';
 import { Title } from '@angular/platform-browser';
-import { PollFormComponent } from 'app/site/polls/components/poll-form/poll-form.component';
+
+import { TranslateService } from '@ngx-translate/core';
+
 import { MotionPollMethods } from 'app/shared/models/motions/motion-poll';
+import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
+import { MotionPollMethodsVerbose } from 'app/site/motions/models/view-motion-poll';
+import { BasePollDialogComponent } from 'app/site/polls/components/base-poll-dialog.component';
+import { PollFormComponent } from 'app/site/polls/components/poll-form/poll-form.component';
 
 @Component({
     selector: 'os-motion-poll-dialog',
     templateUrl: './motion-poll-dialog.component.html',
     styleUrls: ['./motion-poll-dialog.component.scss']
 })
-export class MotionPollDialogComponent extends PollDialogComponent {
+export class MotionPollDialogComponent extends BasePollDialogComponent {
     public motionPollMethods = MotionPollMethodsVerbose;
 
     @ViewChild('pollForm', { static: false })
     protected pollForm: PollFormComponent;
 
-    constructor(
+    public constructor(
         private fb: FormBuilder,
         title: Title,
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
-        public dialogRef: MatDialogRef<PollDialogComponent>,
+        public dialogRef: MatDialogRef<BasePollDialogComponent>,
         @Inject(MAT_DIALOG_DATA) protected pollData: Partial<ViewMotionPoll>
     ) {
         super(title, translate, matSnackbar, dialogRef);
         this.createDialog();
-    }
-
-    /**
-     * This builds an object, where all `undefined` fields will be interpreted as `-2`.
-     *
-     * @returns The object ready to send.
-     */
-    public getVoteData(): object {
-        const empty = Object.values(this.dialogVoteForm.value).every(value => !value);
-        if (empty) {
-            return undefined;
-        }
-        const result = {};
-        for (const key of Object.keys(this.dialogVoteForm.value)) {
-            result[key] = !!this.dialogVoteForm.value[key] ? this.dialogVoteForm.value[key] : -2;
-        }
-        return result;
     }
 
     private updateDialogVoteForm(data: Partial<ViewMotionPoll>): void {
@@ -62,13 +46,10 @@ export class MotionPollDialogComponent extends PollDialogComponent {
         if (data.pollmethod === 'YNA') {
             update.A = data.options[0].abstain;
         }
+
         if (this.dialogVoteForm) {
-            Object.keys(this.dialogVoteForm.controls).forEach(key => {
-                if (update[key] === -2) {
-                    update[key] = null;
-                }
-                this.dialogVoteForm.get(key).setValue(update[key]);
-            });
+            const result = this.undoReplaceEmptyValues(update);
+            this.dialogVoteForm.setValue(result);
         }
     }
 

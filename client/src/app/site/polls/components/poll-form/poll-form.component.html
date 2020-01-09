@@ -17,7 +17,7 @@
         </span>
     </div>
     <form [formGroup]="contentForm" class="poll-preview--meta-info-form">
-        <ng-container *ngIf="true || !data.state || data.state === 1">
+        <ng-container *ngIf="!data.state || data.state === 1">
             <mat-form-field *ngIf="pollService.isElectronicVotingEnabled">
                 <mat-select [placeholder]="'Poll type' | translate" formControlName="type" required>
                     <mat-option *ngFor="let option of pollTypes | keyvalue" [value]="option.key">

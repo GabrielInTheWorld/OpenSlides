@@ -12,8 +12,6 @@ import {
     ViewBasePoll
 } from 'app/site/polls/models/view-base-poll';
 import { ConstantsService } from '../../../core/core-services/constants.service';
-import { MotionPoll } from 'app/shared/models/motions/motion-poll';
-import { AssignmentPoll } from 'app/shared/models/assignments/assignment-poll';
 
 /**
  * The possible keys of a poll object that represent numbers.
@@ -36,10 +34,10 @@ export type CalculablePollKey =
 export type PollVoteValue = 'Yes' | 'No' | 'Abstain' | 'Votes';
 
 export const VoteValuesVerbose = {
-    "Y": "Yes",
-    "N": "No",
-    "A": "Abstain"
-}
+    Y: 'Yes',
+    N: 'No',
+    A: 'Abstain'
+};
 
 /**
  * Interface representing possible majority calculation methods. The implementing

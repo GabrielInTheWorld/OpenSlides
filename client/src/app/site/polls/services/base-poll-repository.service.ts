@@ -20,9 +20,9 @@ import { ViewBasePoll } from '../models/view-base-poll';
     providedIn: 'root'
 })
 export abstract class BasePollRepositoryService<
-    V extends ViewBasePoll & T,
-    M extends BasePoll,
-    T extends TitleInformation
+    V extends ViewBasePoll & T = any,
+    M extends BasePoll = any,
+    T extends TitleInformation = any
 > extends BaseRepository<V, M, T> {
     // just passing everything to superclass
     public constructor(
@@ -83,5 +83,10 @@ export abstract class BasePollRepositoryService<
 
     private restPath(poll: BasePoll): string {
         return `/rest/${poll.collectionString}/${poll.id}`;
+    }
+
+    public pseudoanonymize(poll: BasePoll): Promise<void> {
+        const path = this.restPath(poll);
+        return this.http.post(`${path}/pseudoanonymize/`);
     }
 }

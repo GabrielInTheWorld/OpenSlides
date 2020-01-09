@@ -1,68 +1,58 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { Title } from '@angular/platform-browser';
 
 import { TranslateService } from '@ngx-translate/core';
 
 import { OperatorService } from 'app/core/core-services/operator.service';
+import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
 import { MotionVoteRepositoryService } from 'app/core/repositories/motions/motion-vote-repository.service';
-import { VotingError, VotingService } from 'app/core/ui-services/voting.service';
+import { VotingService } from 'app/core/ui-services/voting.service';
 import { MotionPollMethods } from 'app/shared/models/motions/motion-poll';
-import { BaseViewComponent } from 'app/site/base/base-view';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { ViewMotionVote } from 'app/site/motions/models/view-motion-vote';
-import { ViewUser } from 'app/site/users/models/view-user';
-import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
+import { BasePollVoteComponent } from 'app/site/polls/components/base-poll-vote.component';
 
 @Component({
     selector: 'os-motion-poll-vote',
     templateUrl: './motion-poll-vote.component.html',
     styleUrls: ['./motion-poll-vote.component.scss']
 })
-export class MotionPollVoteComponent extends BaseViewComponent implements OnInit {
-    @Input()
-    public poll: ViewMotionPoll;
-
+export class MotionPollVoteComponent extends BasePollVoteComponent<ViewMotionPoll> implements OnInit {
     // holds the currently selected vote
     public selectedVote: 'Y' | 'N' | 'A' = null;
     // holds the last saved vote
     public currentVote: ViewMotionVote;
 
     public pollMethods = MotionPollMethods;
-    public votingErrors = VotingError;
 
-    private user: ViewUser;
     private votes: ViewMotionVote[];
 
     public constructor(
-        public vmanager: VotingService,
         title: Title,
-        protected translate: TranslateService,
+        translate: TranslateService,
         matSnackbar: MatSnackBar,
+        vmanager: VotingService,
+        operator: OperatorService,
         private voteRepo: MotionVoteRepositoryService,
-        private pollRepo: MotionPollRepositoryService,
-        private operator: OperatorService
+        private pollRepo: MotionPollRepositoryService
     ) {
-        super(title, translate, matSnackbar);
+        super(title, translate, matSnackbar, vmanager, operator);
     }
 
     public ngOnInit(): void {
         this.subscriptions.push(
-            this.operator.getViewUserObservable().subscribe(user => {
-                this.user = user;
-                this.updateVote();
-            }),
             this.voteRepo.getViewModelListObservable().subscribe(votes => {
                 this.votes = votes;
-                this.updateVote();
+                this.updateVotes();
             })
         );
     }
 
-    private updateVote(): void {
+    protected updateVotes(): void {
         if (this.user && this.votes && this.poll) {
             const filtered = this.votes.filter(
-                vote => vote.option.poll.id === this.poll.id && vote.user.id === this.user.id
+                vote => vote.option.poll_id === this.poll.id && vote.user_id === this.user.id
             );
             if (filtered.length) {
                 if (filtered.length > 1) {

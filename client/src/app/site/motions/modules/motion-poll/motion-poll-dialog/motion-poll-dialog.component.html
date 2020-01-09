@@ -6,14 +6,14 @@
             <os-check-input
                 [placeholder]="'Yes' | translate"
                 [checkboxValue]="-1"
-                [inputType]="'number'"
+                inputType="number"
                 [checkboxLabel]="'Majority' | translate"
                 formControlName="Y"
             ></os-check-input>
             <os-check-input
                 [placeholder]="'No' | translate"
                 [checkboxValue]="-1"
-                [inputType]="'number'"
+                inputType="number"
                 [checkboxLabel]="'Majority' | translate"
                 formControlName="N"
             ></os-check-input>
@@ -21,25 +21,25 @@
                 *ngIf="pollForm.contentForm.get('pollmethod').value === motionPollMethods.YNA"
                 [placeholder]="'Abstain' | translate"
                 [checkboxValue]="-1"
-                [inputType]="'number'"
+                inputType="number"
                 [checkboxLabel]="'Majority' | translate"
                 formControlName="A"
             ></os-check-input>
             <os-check-input
                 [placeholder]="'Votes valid' | translate"
-                [inputType]="'number'"
+                inputType="number"
                 formControlName="votesvalid"
             ></os-check-input>
             <os-check-input
                 [placeholder]="'Votes invalid' | translate"
                 [checkboxValue]="-1"
-                [inputType]="'number'"
+                inputType="number"
                 [checkboxLabel]="'Majority' | translate"
                 formControlName="votesinvalid"
             ></os-check-input>
             <os-check-input
                 [placeholder]="'Votes cast' | translate"
-                [inputType]="'number'"
+                inputType="number"
                 formControlName="votescast"
             ></os-check-input>
         </form>

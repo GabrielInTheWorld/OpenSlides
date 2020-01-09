@@ -7,12 +7,12 @@ import { RelationManagerService } from 'app/core/core-services/relation-manager.
 import { ViewModelStoreService } from 'app/core/core-services/view-model-store.service';
 import { RelationDefinition } from 'app/core/definitions/relations';
 import { AssignmentVote } from 'app/shared/models/assignments/assignment-vote';
+import { ViewAssignmentOption } from 'app/site/assignments/models/view-assignment-option';
 import { ViewAssignmentVote } from 'app/site/assignments/models/view-assignment-vote';
 import { ViewUser } from 'app/site/users/models/view-user';
 import { BaseRepository } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
-import { ViewAssignmentOption } from 'app/site/assignments/models/view-assignment-option';
 
 const AssignmentVoteRelations: RelationDefinition[] = [
     {

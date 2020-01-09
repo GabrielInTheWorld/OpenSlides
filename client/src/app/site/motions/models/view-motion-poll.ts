@@ -22,7 +22,7 @@ export class ViewMotionPoll extends ViewBasePoll<MotionPoll> implements MotionPo
 
     public generateChartData(): ChartData {
         const fields = ['yes', 'no'];
-        if (this.pollmethod == MotionPollMethods.YNA) {
+        if (this.pollmethod === MotionPollMethods.YNA) {
             fields.push('abstain');
         }
         const data: ChartData = fields.map(key => ({

@@ -1,3 +1,4 @@
+import { ChartData } from 'app/shared/components/charts/charts.component';
 import { AssignmentPoll } from 'app/shared/models/assignments/assignment-poll';
 import { ProjectorElementBuildDeskriptor } from 'app/site/base/projectable';
 import { ViewBasePoll } from 'app/site/polls/models/view-base-poll';
@@ -37,6 +38,11 @@ export class ViewAssignmentPoll extends ViewBasePoll<AssignmentPoll> implements 
 
     public get pollmethodVerbose(): string {
         return AssignmentPollMethodsVerbose[this.pollmethod];
+    }
+
+    // TODO
+    public generateChartData(): ChartData {
+        return [];
     }
 }
 

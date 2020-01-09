@@ -455,11 +455,10 @@
                     <span translate>New poll</span>
                 </button>
             </div>
-            <os-motion-poll-preview
+            <os-motion-poll
                 *ngFor="let poll of motion.polls; trackBy: trackByIndex"
                 [poll]="poll"
-                (edit)="openDialog(poll)"
-            ></os-motion-poll-preview>
+            ></os-motion-poll>
             <!-- <os-motion-poll-manager [motion]="motion"></os-motion-poll-manager> -->
         </div>
     </div>

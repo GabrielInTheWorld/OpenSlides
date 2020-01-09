@@ -64,10 +64,10 @@
     <ng-container *ngIf="poll">
         <button
             mat-menu-item
-            (click)="state.key === 1 ? pollRepo.resetPoll(poll) : pollRepo.changePollState(poll)"
+            (click)="state.value === 1 ? pollRepo.resetPoll(poll) : pollRepo.changePollState(poll)"
             *ngFor="let state of poll.nextStates | keyvalue"
         >
-            <span translate>{{ state.value }}</span>
+            <span translate>{{ state.key }}</span>
         </button>
     </ng-container>
 </mat-menu>

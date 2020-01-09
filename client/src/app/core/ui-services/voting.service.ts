@@ -13,6 +13,15 @@ export enum VotingError {
     USER_HAS_VOTED
 }
 
+export const VotingErrorVerbose = {
+    1: "You can't vote on this poll right now because it's not in the 'Started' state.",
+    2: "You can't vote on this poll because its type is set to analog voting.",
+    3: "You don't have permission to vote on this poll.",
+    4: 'You have to be logged in to be able to vote.',
+    5: 'You have to be present to vote on a poll.',
+    6: "You have already voted on this poll. You can't change your vote in a pseudoanonymous poll."
+};
+
 @Injectable({
     providedIn: 'root'
 })
@@ -23,14 +32,14 @@ export class VotingService {
      * checks whether the operator can vote on the given poll
      */
     public canVote(poll: ViewBasePoll): boolean {
-        return !this.getVotePermissionErrors(poll);
+        return !this.getVotePermissionError(poll);
     }
 
     /**
      * checks whether the operator can vote on the given poll
      * @returns null if no errors exist (= user can vote) or else a VotingError
      */
-    public getVotePermissionErrors(poll: ViewBasePoll): VotingError | void {
+    public getVotePermissionError(poll: ViewBasePoll): VotingError | void {
         const user = this.operator.viewUser;
         if (this.operator.isAnonymous) {
             return VotingError.USER_IS_ANONYMOUS;
@@ -49,6 +58,13 @@ export class VotingService {
         }
         if (poll.type === PollType.Pseudoanonymous && poll.user_has_voted) {
             return VotingError.USER_HAS_VOTED;
+        }
+    }
+
+    public getVotePermissionErrorVerbose(poll: ViewBasePoll): string | void {
+        const error = this.getVotePermissionError(poll);
+        if (error) {
+            return VotingErrorVerbose[error];
         }
     }
 }

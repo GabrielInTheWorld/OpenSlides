@@ -1,21 +1,22 @@
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Title } from '@angular/platform-browser';
 
+import { TranslateService } from '@ngx-translate/core';
+
+import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
+import { GeneralValueVerbose, VoteValue, VoteValueVerbose } from 'app/shared/models/poll/base-vote';
+import { AssignmentPollMethodsVerbose } from 'app/site/assignments/models/view-assignment-poll';
+import { BasePollDialogComponent } from 'app/site/polls/components/base-poll-dialog.component';
+import { PollFormComponent } from 'app/site/polls/components/poll-form/poll-form.component';
 import { CalculablePollKey, PollVoteValue } from 'app/site/polls/services/poll.service';
+import { ViewUser } from 'app/site/users/models/view-user';
 import { ViewAssignmentOption } from '../../models/view-assignment-option';
 import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
-import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
-import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material';
-import { TranslateService } from '@ngx-translate/core';
-import { Title } from '@angular/platform-browser';
-import { ViewUser } from 'app/site/users/models/view-user';
-import { VoteValue, VoteValueVerbose } from 'app/shared/models/poll/base-vote';
-import { AssignmentPollMethodsVerbose } from 'app/site/assignments/models/view-assignment-poll';
-import { PollFormComponent } from 'app/site/polls/components/poll-form/poll-form.component';
 
-type OptionsObject = { id: number, user: ViewUser }[];
+type OptionsObject = { user_id: number; user: ViewUser }[];
 
 /**
  * A dialog for updating the values of an assignment-related poll.
@@ -25,17 +26,12 @@ type OptionsObject = { id: number, user: ViewUser }[];
     templateUrl: './assignment-poll-dialog.component.html',
     styleUrls: ['./assignment-poll-dialog.component.scss']
 })
-export class AssignmentPollDialogComponent extends PollDialogComponent implements OnInit {
+export class AssignmentPollDialogComponent extends BasePollDialogComponent implements OnInit {
     /**
      * The summary values that will have fields in the dialog
      */
-    public get sumValues() {
-        const generalValues = ['votesvalid', 'votesinvalid', 'votescast'];
-        if (this.pollData.pollmethod === 'votes') {
-            return ['votesno', 'votesabstain', ...generalValues];
-        } else {
-            return generalValues;
-        }
+    public get sumValues(): string[] {
+        return ['votesvalid', 'votesinvalid', 'votescast'];
     }
 
     /**
@@ -54,6 +50,7 @@ export class AssignmentPollDialogComponent extends PollDialogComponent implement
     public analogPollValues: VoteValue[];
 
     public voteValueVerbose = VoteValueVerbose;
+    public generalValueVerbose = GeneralValueVerbose;
 
     public assignmentPollMethods = AssignmentPollMethodsVerbose;
 
@@ -68,54 +65,29 @@ export class AssignmentPollDialogComponent extends PollDialogComponent implement
         title: Title,
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
-        public dialogRef: MatDialogRef<PollDialogComponent>,
+        public dialogRef: MatDialogRef<BasePollDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public pollData: Partial<ViewAssignmentPoll>
     ) {
         super(title, translate, matSnackbar, dialogRef);
-
-        this.options = pollData.options ? pollData.options : pollData.assignment.candidates.map(user => ({
-            id: user.id,
-            user: user
-        }), {});
     }
 
     public ngOnInit(): void {
-        this.setAnalogPollValues();
-        this.createDialog();
+        // on new poll creation, poll.options does not exist, so we have to build a substitute from the assignment candidates
+        this.options = this.pollData.options
+            ? this.pollData.options
+            : this.pollData.assignment.candidates.map(
+                  user => ({
+                      user_id: user.id,
+                      user: user
+                  }),
+                  {}
+              );
 
         this.subscriptions.push(
-            this.pollForm.contentForm.get("pollmethod").valueChanges.subscribe(() => {
-                this.setAnalogPollValues();
+            this.pollForm.contentForm.get('pollmethod').valueChanges.subscribe(() => {
                 this.createDialog();
             })
         );
-    }
-
-    public getVoteData(): object {
-        const empty = Object.values(this.dialogVoteForm.value).every(value => !value);
-        console.log(this.dialogVoteForm.value, empty);
-        if (empty) {
-            return undefined;
-        }
-        const result = {}, value = this.dialogVoteForm.value;
-        for (const key of Object.keys(value)) {
-            if (typeof value[key] === "object") {
-                result[key] = 
-            }
-            result[key] = !!value[key] ? value[key] : -2;
-        }
-        return { options: result };
-    }
-
-    private replaceEmptyValues(object: object): void {
-        const result = {};
-        for (const key of Object.keys(object)) {
-            if (typeof object[key] === "object") {
-                result[key] = this.replaceEmptyValues
-            }
-            result[key] = !!object[key] ? object[key] : -2;
-        }
-
     }
 
     private setAnalogPollValues(): void {
@@ -129,30 +101,60 @@ export class AssignmentPollDialogComponent extends PollDialogComponent implement
         }
     }
 
+    private updateDialogVoteForm(data: Partial<ViewAssignmentPoll>): void {
+        const update = {
+            options: {},
+            votesvalid: data.votesvalid,
+            votesinvalid: data.votesinvalid,
+            votescast: data.votescast
+        };
+        for (const option of data.options) {
+            const votes: any = {};
+            votes.Y = option.yes;
+            if (data.pollmethod !== AssignmentPollMethods.Votes) {
+                votes.N = option.no;
+            }
+            if (data.pollmethod === AssignmentPollMethods.YNA) {
+                votes.A = option.abstain;
+            }
+            update.options[option.user_id] = votes;
+        }
+
+        if (this.dialogVoteForm) {
+            const result = this.undoReplaceEmptyValues(update);
+            this.dialogVoteForm.setValue(result);
+        }
+    }
+
     /**
      * Pre-executed method to initialize the dialog-form depending on the poll-method.
      */
     private createDialog(): void {
+        this.setAnalogPollValues();
+
         this.dialogVoteForm = this.fb.group({
             options: this.fb.group(
-                this.options.reduce((aggr, option) => {
-                    aggr[option.id] = this.fb.group(
-                        this.analogPollValues.reduce((aggr, value) => {
-                            aggr[value] = ['', [Validators.min(-2)]];
-                            return aggr;
+                // create a form group for each option with the user id as key
+                this.options.reduce((options, option) => {
+                    options[option.user_id] = this.fb.group(
+                        // for each user, create a form group with a control for each valid input (Y, N, A)
+                        this.analogPollValues.reduce((pollValues, value) => {
+                            pollValues[value] = ['', [Validators.min(-2)]];
+                            return pollValues;
                         }, {})
                     );
-                    return aggr;
+                    return options;
                 }, {})
             ),
-            votesvalid: ['', [Validators.min(-2)]],
-            votesinvalid: ['', [Validators.min(-2)]],
-            votescast: ['', [Validators.min(-2)]]
+            // insert all used global fields
+            ...this.sumValues.reduce((sumValues, value) => {
+                sumValues[value] = ['', [Validators.min(-2)]];
+                return sumValues;
+            }, {})
         });
-        console.log(this.dialogVoteForm.controls);
-        // if (this.pollData.poll) {
-        //     this.updateDialogVoteForm(this.pollData);
-        // }
+        if (this.pollData.poll) {
+            this.updateDialogVoteForm(this.pollData);
+        }
     }
 
     /**
@@ -242,9 +244,5 @@ export class AssignmentPollDialogComponent extends PollDialogComponent implement
      */
     public setSumValue(value: any /*SummaryPollKey*/, weight: string): void {
         this.pollData[value] = parseFloat(weight);
-    }
-
-    public getGridClass(): string {
-        return `votes-grid-${this.analogPollValues.length}`;
     }
 }

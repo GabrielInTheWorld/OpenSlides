@@ -2,25 +2,22 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { E2EImportsModule } from 'e2e-imports.module';
 
-import { PollDialogComponent } from './poll-dialog.component';
+import { MotionPollComponent } from './motion-poll.component';
 
-describe('PollDialogComponent', () => {
-    let component: PollDialogComponent;
-    let fixture: ComponentFixture<PollDialogComponent>;
-
+describe('MotionPollComponent', () => {
+    let component: MotionPollComponent;
+    let fixture: ComponentFixture<MotionPollComponent>;
     beforeEach(async(() => {
         TestBed.configureTestingModule({
             imports: [E2EImportsModule],
-            declarations: [PollDialogComponent]
+            declarations: [MotionPollComponent]
         }).compileComponents();
     }));
-
     beforeEach(() => {
-        fixture = TestBed.createComponent(PollDialogComponent);
+        fixture = TestBed.createComponent(MotionPollComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
-
     it('should create', () => {
         expect(component).toBeTruthy();
     });

@@ -2,18 +2,35 @@
 <ng-container *ngIf="pollForm.contentForm.get('type').value === 'analog'">
     <!-- Candidate values -->
     <form [formGroup]="dialogVoteForm">
-        <div *ngFor="let option of options" [ngClass]="getGridClass()">
-            <div>
-                <span *ngIf="option.user">{{ option.user.getFullName() }}</span>
-                <span *ngIf="!option.user">No user {{ option.candidate_id }}</span>
+        <div formGroupName="options">
+            <div *ngFor="let option of options" class="votes-grid">
+                <div>
+                    <span *ngIf="option.user">{{ option.user.getFullName() }}</span>
+                    <span *ngIf="!option.user">No user {{ option.candidate_id }}</span>
+                </div>
+                
+                <div>
+                    <div *ngFor="let value of analogPollValues" [formGroupName]="option.user_id">
+                        <os-check-input
+                            [placeholder]="voteValueVerbose[value] | translate"
+                            [checkboxValue]="-1"
+                            inputType="number"
+                            [checkboxLabel]="'Majority' | translate"
+                            [formControlName]="value"
+                        ></os-check-input>
+                    </div>
+                </div>
             </div>
-            
-            <div *ngFor="let value of analogPollValues" [formGroupName]="option.id" class="votes">
-                <mat-form-field>
-                    <input type="number" matInput min="0" [formControlName]="value">
-                    <mat-label>{{ voteValueVerbose[value] | translate }}</mat-label>
-                </mat-form-field>
-            </div>
+        </div>
+        <div *ngFor="let value of sumValues" class="votes-grid">
+            <div></div>
+            <os-check-input
+                [placeholder]="generalValueVerbose[value] | translate"
+                [checkboxValue]="-1"
+                inputType="number"
+                [checkboxLabel]="'Majority' | translate"
+                [formControlName]="value"
+            ></os-check-input>
         </div>
     </form>
     <mat-divider></mat-divider>

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
@@ -7,20 +7,13 @@ import { Title } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 
 import { OperatorService } from 'app/core/core-services/operator.service';
-import { CalculablePollKey, CalculableMajorityMethod } from 'app/site/polls/services/poll.service';
-import { BaseViewComponent } from 'app/site/base/base-view';
-import { AssignmentPollPdfService } from '../../services/assignment-poll-pdf.service';
-import { ViewAssignment } from '../../models/view-assignment';
-import { ViewAssignmentOption } from '../../models/view-assignment-option';
-import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
 import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
 import { PromptService } from 'app/core/ui-services/prompt.service';
-import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
-import { filter } from 'rxjs/operators';
-import { AssignmentVoteRepositoryService } from 'app/core/repositories/assignments/assignment-vote-repository.service';
-import { AssignmentVote } from 'app/shared/models/assignments/assignment-vote';
-import { ViewUser } from 'app/site/users/models/view-user';
-import { ViewAssignmentVote } from '../../models/view-assignment-vote';
+import { PollState } from 'app/shared/models/poll/base-poll';
+import { BaseViewComponent } from 'app/site/base/base-view';
+import { AssignmentPollDialogService } from '../../services/assignment-poll-dialog.service';
+import { ViewAssignmentOption } from '../../models/view-assignment-option';
+import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
 
 /**
  * Component for a single assignment poll. Used in assignment detail view
@@ -64,14 +57,6 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         return this.descriptionForm.get('description').value !== this.poll.description;
     }
 
-    /** holds the currently saved votes */
-    private currentVotes: { [key: number]: string | number | null } = {};
-
-    private votes: ViewAssignmentVote[];
-    private user: ViewUser;
-
-    public voteForm: FormGroup;
-
     public constructor(
         titleService: Title,
         matSnackBar: MatSnackBar,
@@ -79,10 +64,9 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         private formBuilder: FormBuilder,
         public translate: TranslateService,
         public dialog: MatDialog,
-        private pdfService: AssignmentPollPdfService,
         private promptService: PromptService,
         private repo: AssignmentPollRepositoryService,
-        private voteRepo: AssignmentVoteRepositoryService
+        private pollDialog: AssignmentPollDialogService
     ) {
         super(titleService, translate, matSnackBar);
     }
@@ -94,43 +78,10 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         this.descriptionForm = this.formBuilder.group({
             description: this.poll ? this.poll.description : ''
         });
-        this.subscriptions.push(
-            this.operator.getViewUserObservable().subscribe(user => {
-                this.user = user;
-                this.updateVotes();
-            }),
-            this.voteRepo.getViewModelListObservable().subscribe(votes => {
-                this.votes = votes;
-                this.updateVotes();
-            })
-        );
     }
 
-    private updateVotes(): void {
-        if (this.user && this.votes && this.poll) {
-            const filtered = this.votes.filter(
-                vote => vote.option.poll.id === this.poll.id && vote.user.id === this.user.id
-            );
-            this.voteForm = this.formBuilder.group(
-                this.poll.options.reduce((obj, option) => {
-                    obj[option.id] = ['', [Validators.required]];
-                    return obj;
-                }, {})
-            );
-            for (let option of this.poll.options) {
-                let vote = filtered.find(vote => vote.option.id === option.id);
-                this.currentVotes[option.id] = vote
-                    ? this.poll.pollmethod === AssignmentPollMethods.Votes
-                        ? vote.weight
-                        : vote.value
-                    : null;
-                this.voteForm.get(option.id.toString()).setValue(this.currentVotes[option.id]);
-            }
-        }
-    }
-
-    public saveVotes(): void {
-        this.repo.vote(this.voteForm.value, this.poll.id).catch(this.raiseError);
+    public changeState(key: PollState): void {
+        key === PollState.Created ? this.repo.resetPoll(this.poll) : this.repo.changePollState(this.poll);
     }
 
     /**
@@ -141,6 +92,13 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         if (await this.promptService.open(title)) {
             await this.repo.delete(this.poll).catch(this.raiseError);
         }
+    }
+
+    /**
+     * Edits the poll
+     */
+    public openDialog(): void {
+        this.pollDialog.openDialog(this.poll);
     }
 
     /**
@@ -169,29 +127,6 @@ export class AssignmentPollComponent extends BaseViewComponent implements OnInit
         );
         return yesQuorum && amount >= yesQuorum;*/
         throw new Error('TODO');
-    }
-
-    /**
-     * Opens the {@link AssignmentPollDialogComponent} dialog and then updates the votes, if the dialog
-     * closes successfully (validation is done there)
-     */
-    public enterVotes(): void {
-        /*const dialogRef = this.dialog.open(AssignmentPollDialogComponent, {
-            data: this.poll.copy(),
-            ...mediumDialogSettings
-        });
-        dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-                this.assignmentRepo.updateVotes(result, this.poll).catch(this.raiseError);
-            }
-        });*/
-    }
-
-    /**
-     * Toggles the 'published' state
-     */
-    public togglePublished(): void {
-        // this.assignmentRepo.updatePoll({ published: !this.poll.published }, this.poll);
     }
 
     /**

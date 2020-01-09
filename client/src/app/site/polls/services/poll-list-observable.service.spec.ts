@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 
-import { PollListObservableService } from './poll-list-observable.service';
 import { E2EImportsModule } from 'e2e-imports.module';
+
+import { PollListObservableService } from './poll-list-observable.service';
 
 describe('PollListObservableService', () => {
     beforeEach(() =>

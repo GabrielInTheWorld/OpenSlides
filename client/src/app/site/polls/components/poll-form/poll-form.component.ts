@@ -1,19 +1,21 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material';
+import { Title } from '@angular/platform-browser';
+
+import { TranslateService } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+
+import { GroupRepositoryService } from 'app/core/repositories/users/group-repository.service';
+import { PercentBase } from 'app/shared/models/poll/base-poll';
+import { BaseViewComponent } from 'app/site/base/base-view';
 import {
-    PollTypeVerbose,
-    PercentBaseVerbose,
     MajorityMethodVerbose,
+    PercentBaseVerbose,
+    PollTypeVerbose,
     ViewBasePoll
 } from 'app/site/polls/models/view-base-poll';
-import { Observable } from 'rxjs';
 import { ViewGroup } from 'app/site/users/models/view-group';
-import { GroupRepositoryService } from 'app/core/repositories/users/group-repository.service';
-import { BaseViewComponent } from 'app/site/base/base-view';
-import { Title } from '@angular/platform-browser';
-import { TranslateService } from '@ngx-translate/core';
-import { MatSnackBar } from '@angular/material';
-import { PercentBase } from 'app/shared/models/poll/base-poll';
 import { PollService } from '../../services/poll.service';
 
 @Component({
@@ -97,8 +99,8 @@ export class PollFormComponent extends BaseViewComponent implements OnInit {
      */
     public ngOnInit(): void {
         this.groupObservable = this.groupRepo.getViewModelListObservable();
-        
-        Object.keys(this.contentForm.controls).forEach(key => <any>console.log(key, this.data[key]) || this.contentForm.get(key).setValue(this.data[key]));
+
+        Object.keys(this.contentForm.controls).forEach(key => this.contentForm.get(key).setValue(this.data[key]));
         this.updatePollValues(this.contentForm.value);
 
         this.subscriptions.push(

@@ -3,23 +3,20 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
 import { DataSendService } from 'app/core/core-services/data-send.service';
+import { HttpService } from 'app/core/core-services/http.service';
 import { RelationManagerService } from 'app/core/core-services/relation-manager.service';
 import { ViewModelStoreService } from 'app/core/core-services/view-model-store.service';
 import { RelationDefinition } from 'app/core/definitions/relations';
 import { VotingService } from 'app/core/ui-services/voting.service';
-import { AssignmentOption } from 'app/shared/models/assignments/assignment-option';
 import { AssignmentPoll } from 'app/shared/models/assignments/assignment-poll';
+import { ViewAssignment } from 'app/site/assignments/models/view-assignment';
 import { ViewAssignmentOption } from 'app/site/assignments/models/view-assignment-option';
 import { AssignmentPollTitleInformation, ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-poll';
-import { ViewAssignmentVote } from 'app/site/assignments/models/view-assignment-vote';
 import { BasePollRepositoryService } from 'app/site/polls/services/base-poll-repository.service';
 import { ViewGroup } from 'app/site/users/models/view-group';
 import { ViewUser } from 'app/site/users/models/view-user';
-import { NestedModelDescriptors } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
-import { ViewAssignment } from 'app/site/assignments/models/view-assignment';
-import { HttpService } from 'app/core/core-services/http.service';
 
 const AssignmentPollRelations: RelationDefinition[] = [
     {

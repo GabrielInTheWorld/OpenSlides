@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
 import { DataSendService } from 'app/core/core-services/data-send.service';
-import { HttpService } from 'app/core/core-services/http.service';
 import { RelationManagerService } from 'app/core/core-services/relation-manager.service';
 import { ViewModelStoreService } from 'app/core/core-services/view-model-store.service';
 import { RelationDefinition } from 'app/core/definitions/relations';
@@ -14,8 +13,6 @@ import { ViewUser } from 'app/site/users/models/view-user';
 import { BaseRepository } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
-import { Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
 
 const MotionVoteRelations: RelationDefinition[] = [
     {
@@ -55,8 +52,7 @@ export class MotionVoteRepositoryService extends BaseRepository<ViewMotionVote, 
         mapperService: CollectionStringMapperService,
         viewModelStoreService: ViewModelStoreService,
         translate: TranslateService,
-        relationManager: RelationManagerService,
-        private http: HttpService
+        relationManager: RelationManagerService
     ) {
         super(
             DS,

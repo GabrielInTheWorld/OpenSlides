@@ -48,6 +48,7 @@ import { ViewCreateMotion } from 'app/site/motions/models/view-create-motion';
 import { ViewMotion } from 'app/site/motions/models/view-motion';
 import { ViewMotionBlock } from 'app/site/motions/models/view-motion-block';
 import { ViewMotionChangeRecommendation } from 'app/site/motions/models/view-motion-change-recommendation';
+import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { ViewStatuteParagraph } from 'app/site/motions/models/view-statute-paragraph';
 import { ViewWorkflow } from 'app/site/motions/models/view-workflow';
 import { MotionEditNotification } from 'app/site/motions/motion-edit-notification';
@@ -61,6 +62,7 @@ import {
 import { LocalPermissionsService } from 'app/site/motions/services/local-permissions.service';
 import { MotionFilterListService } from 'app/site/motions/services/motion-filter-list.service';
 import { MotionPdfExportService } from 'app/site/motions/services/motion-pdf-export.service';
+import { MotionPollDialogService } from 'app/site/motions/services/motion-poll-dialog.service';
 import { MotionSortListService } from 'app/site/motions/services/motion-sort-list.service';
 import { ViewTag } from 'app/site/tags/models/view-tag';
 import { ViewUser } from 'app/site/users/models/view-user';
@@ -72,11 +74,6 @@ import {
     MotionTitleChangeRecommendationDialogComponent,
     MotionTitleChangeRecommendationDialogComponentData
 } from '../motion-title-change-recommendation-dialog/motion-title-change-recommendation-dialog.component';
-import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
-import { MotionPollService } from 'app/site/motions/services/motion-poll.service';
-import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
-import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
-import { MotionPollDialogService } from 'app/site/motions/services/motion-poll-dialog.service';
 
 /**
  * Component for the motion detail view
@@ -1614,9 +1611,7 @@ export class MotionDetailComponent extends BaseViewComponent implements OnInit, 
 
     public openDialog(poll?: ViewMotionPoll): void {
         this.pollDialog.openDialog(
-            poll
-                ? poll
-                : { collectionString: ViewMotionPoll.COLLECTIONSTRING, motion_id: this.motion.id }
+            poll ? poll : { collectionString: ViewMotionPoll.COLLECTIONSTRING, motion_id: this.motion.id }
         );
     }
 }

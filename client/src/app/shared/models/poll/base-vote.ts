@@ -1,11 +1,19 @@
 import { BaseDecimalModel } from '../base/base-decimal-model';
 
-export type VoteValue = "Y" | "N" | "A";
+export type VoteValue = 'Y' | 'N' | 'A';
 
 export const VoteValueVerbose = {
     Y: 'Yes',
     N: 'No',
     A: 'Abstain'
+};
+
+export const GeneralValueVerbose = {
+    votesvalid: 'Votes valid',
+    votesinvalid: 'Votes invalid',
+    votescast: 'Votes cast',
+    votesno: 'Votes No',
+    votesabstain: 'Votes abstain'
 };
 
 export abstract class BaseVote<T> extends BaseDecimalModel<T> {

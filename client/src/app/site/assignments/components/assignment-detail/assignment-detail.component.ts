@@ -22,13 +22,10 @@ import { LocalPermissionsService } from 'app/site/motions/services/local-permiss
 import { ViewTag } from 'app/site/tags/models/view-tag';
 import { ViewUser } from 'app/site/users/models/view-user';
 import { AssignmentPdfExportService } from '../../services/assignment-pdf-export.service';
-import { AssignmentPhases, ViewAssignment } from '../../models/view-assignment';
-import { ViewAssignmentRelatedUser } from '../../models/view-assignment-related-user';
-import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
-import { BasePoll, PercentBase, MajorityMethod, PollType } from 'app/shared/models/poll/base-poll';
-import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
-import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
 import { AssignmentPollDialogService } from '../../services/assignment-poll-dialog.service';
+import { AssignmentPhases, ViewAssignment } from '../../models/view-assignment';
+import { ViewAssignmentPoll } from '../../models/view-assignment-poll';
+import { ViewAssignmentRelatedUser } from '../../models/view-assignment-related-user';
 
 /**
  * Component for the assignment detail view
@@ -173,7 +170,6 @@ export class AssignmentDetailComponent extends BaseViewComponent implements OnIn
         private route: ActivatedRoute,
         formBuilder: FormBuilder,
         public repo: AssignmentRepositoryService,
-        private pollRepo: AssignmentPollRepositoryService,
         private userRepo: UserRepositoryService,
         private itemRepo: ItemRepositoryService,
         private tagRepo: TagRepositoryService,
@@ -310,7 +306,11 @@ export class AssignmentDetailComponent extends BaseViewComponent implements OnIn
      * Creates a new Poll
      */
     public openDialog(): void {
-        this.pollDialog.openDialog({ collectionString: ViewAssignmentPoll.COLLECTIONSTRING, assignment_id: this.assignment.id, assignment: this.assignment });
+        this.pollDialog.openDialog({
+            collectionString: ViewAssignmentPoll.COLLECTIONSTRING,
+            assignment_id: this.assignment.id,
+            assignment: this.assignment
+        });
     }
 
     /**

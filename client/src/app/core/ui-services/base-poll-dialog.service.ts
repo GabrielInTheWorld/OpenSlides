@@ -1,15 +1,14 @@
+import { ComponentType } from '@angular/cdk/portal';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
-import { mediumDialogSettings } from 'app/shared/utils/dialog-settings';
-import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
-import { ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-poll';
-import { PollState, PollType } from 'app/shared/models/poll/base-poll';
-import { PollService } from '../../site/polls/services/poll.service';
-import { Collection } from 'app/shared/models/base/collection';
+
 import { CollectionStringMapperService } from 'app/core/core-services/collection-string-mapper.service';
+import { Collection } from 'app/shared/models/base/collection';
+import { PollState, PollType } from 'app/shared/models/poll/base-poll';
+import { mediumDialogSettings } from 'app/shared/utils/dialog-settings';
+import { BasePollDialogComponent } from 'app/site/polls/components/base-poll-dialog.component';
 import { ViewBasePoll } from 'app/site/polls/models/view-base-poll';
-import { ComponentType } from '@angular/cdk/portal';
+import { PollService } from '../../site/polls/services/poll.service';
 
 /**
  * Abstract class for showing a poll dialog. Has to be subclassed to provide the right `PollService`
@@ -18,7 +17,7 @@ import { ComponentType } from '@angular/cdk/portal';
     providedIn: 'root'
 })
 export abstract class BasePollDialogService<V extends ViewBasePoll> {
-    protected dialogComponent: ComponentType<PollDialogComponent>;
+    protected dialogComponent: ComponentType<BasePollDialogComponent>;
 
     public constructor(
         private dialog: MatDialog,

@@ -7,7 +7,6 @@ import { ChoiceDialogComponent } from '../shared/components/choice-dialog/choice
 import { OnAfterAppsLoaded } from './definitions/on-after-apps-loaded';
 import { OperatorService } from './core-services/operator.service';
 import { PromptDialogComponent } from '../shared/components/prompt-dialog/prompt-dialog.component';
-import { PollDialogComponent } from 'app/site/polls/components/poll-dialog/poll-dialog.component';
 
 export const ServicesToLoadOnAppsLoaded: Type<OnAfterAppsLoaded>[] = [OperatorService];
 

@@ -10,10 +10,10 @@ import { AssignmentOption } from 'app/shared/models/assignments/assignment-optio
 import { ViewAssignmentOption } from 'app/site/assignments/models/view-assignment-option';
 import { ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-poll';
 import { ViewAssignmentVote } from 'app/site/assignments/models/view-assignment-vote';
+import { ViewUser } from 'app/site/users/models/view-user';
 import { BaseRepository } from '../base-repository';
 import { CollectionStringMapperService } from '../../core-services/collection-string-mapper.service';
 import { DataStoreService } from '../../core-services/data-store.service';
-import { ViewUser } from 'app/site/users/models/view-user';
 
 const AssignmentOptionRelations: RelationDefinition[] = [
     {

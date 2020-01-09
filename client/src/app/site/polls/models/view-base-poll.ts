@@ -1,3 +1,4 @@
+import { ChartData } from 'app/shared/components/charts/charts.component';
 import { BasePoll, PollState } from 'app/shared/models/poll/base-poll';
 import { ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-poll';
 import { BaseProjectableViewModel } from 'app/site/base/base-projectable-view-model';
@@ -49,7 +50,6 @@ export const PercentBaseVerbose = {
 };
 
 export abstract class ViewBasePoll<M extends BasePoll<M, any> = any> extends BaseProjectableViewModel<M> {
-
     public get poll(): M {
         return this._model;
     }
@@ -80,13 +80,15 @@ export abstract class ViewBasePoll<M extends BasePoll<M, any> = any> extends Bas
         return PercentBaseVerbose[this.onehundred_percent_base];
     }
 
+    /**
+     * returns a mapping "verbose_state" -> "state_id" for all valid next states
+     */
     public get nextStates(): { [key: number]: string } {
-        const state = (this.state % Object.keys(PollStateVerbose).length) + 1;
-        const states = {
-            state: PollStateVerbose[state]
-        };
+        const next_state = (this.state % Object.keys(PollStateVerbose).length) + 1;
+        const states = {};
+        states[PollStateVerbose[next_state]] = next_state;
         if (this.state === PollState.Finished) {
-            states[PollState.Created] = PollStateVerbose[PollState.Created];
+            states[PollStateVerbose[PollState.Created]] = PollState.Created;
         }
         return states;
     }
@@ -95,6 +97,8 @@ export abstract class ViewBasePoll<M extends BasePoll<M, any> = any> extends Bas
     public canBeVotedFor: () => boolean;
 
     public abstract getSlide(): ProjectorElementBuildDeskriptor;
+
+    public abstract generateChartData(): ChartData;
 }
 
 export interface ViewBasePoll<M extends BasePoll<M, any> = any> extends BasePoll<M, any> {

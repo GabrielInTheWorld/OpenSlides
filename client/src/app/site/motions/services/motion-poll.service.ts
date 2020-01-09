@@ -5,17 +5,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { ConstantsService } from 'app/core/core-services/constants.service';
 import { MotionPollRepositoryService } from 'app/core/repositories/motions/motion-poll-repository.service';
 import { ConfigService } from 'app/core/ui-services/config.service';
-import { CalculablePollKey, PollMajorityMethod, PollService } from 'app/site/polls/services/poll.service';
-import { MotionPoll, MotionPollMethods } from 'app/shared/models/motions/motion-poll';
-import { MotionPollMethodsVerbose, ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
-import { PollType, PercentBase, MajorityMethod } from 'app/shared/models/poll/base-poll';
-import {
-    MajorityMethodVerbose,
-    PercentBaseVerbose,
-    PollTypeVerbose,
-    PollPropertyVerbose
-} from 'app/site/polls/models/view-base-poll';
 import { Collection } from 'app/shared/models/base/collection';
+import { MotionPollMethods } from 'app/shared/models/motions/motion-poll';
+import { MajorityMethod, PercentBase } from 'app/shared/models/poll/base-poll';
+import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
+import { PollService } from 'app/site/polls/services/poll.service';
 
 /**
  * Service class for motion polls.

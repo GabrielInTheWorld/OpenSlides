@@ -9,6 +9,7 @@ import { AssignmentPollRepositoryService } from 'app/core/repositories/assignmen
 import { GroupRepositoryService } from 'app/core/repositories/users/group-repository.service';
 import { PromptService } from 'app/core/ui-services/prompt.service';
 import { BasePollDetailComponent } from 'app/site/polls/components/base-poll-detail.component';
+import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
 
 @Component({
     selector: 'os-assignment-poll-detail',
@@ -16,6 +17,14 @@ import { BasePollDetailComponent } from 'app/site/polls/components/base-poll-det
     styleUrls: ['./assignment-poll-detail.component.scss']
 })
 export class AssignmentPollDetailComponent extends BasePollDetailComponent {
+    public get columnDefinition(): string[] {
+        let columns = ['user', 'yes', 'no'];
+        if (this.poll.pollmethod === AssignmentPollMethods.YNA) {
+            columns = columns.concat('abstain');
+        }
+        return columns;
+    }
+
     public constructor(
         title: Title,
         translate: TranslateService,

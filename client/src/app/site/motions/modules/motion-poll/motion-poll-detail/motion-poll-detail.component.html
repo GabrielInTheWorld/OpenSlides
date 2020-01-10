@@ -51,7 +51,7 @@
             <os-charts
                 *ngIf="chartDataSubject.value"
                 [type]="chartType"
-                [labels]="labels"
+                [labels]="poll.labels"
                 [showLegend]="true"
                 [data]="chartDataSubject"
             ></os-charts>

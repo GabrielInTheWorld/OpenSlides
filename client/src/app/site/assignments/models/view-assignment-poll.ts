@@ -1,11 +1,12 @@
+import { BehaviorSubject } from 'rxjs';
+
 import { ChartData } from 'app/shared/components/charts/charts.component';
 import { AssignmentPoll, AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
+import { PollColor } from 'app/shared/models/poll/base-poll';
 import { ProjectorElementBuildDeskriptor } from 'app/site/base/projectable';
 import { ViewBasePoll } from 'app/site/polls/models/view-base-poll';
 import { ViewAssignment } from './view-assignment';
 import { ViewAssignmentOption } from './view-assignment-option';
-import { PollColor } from 'app/shared/models/poll/base-poll';
-import { BehaviorSubject } from 'rxjs';
 
 export interface AssignmentPollTitleInformation {
     title: string;

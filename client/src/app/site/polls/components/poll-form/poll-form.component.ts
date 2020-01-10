@@ -79,7 +79,7 @@ export class PollFormComponent extends BaseViewComponent implements OnInit {
         snackbar: MatSnackBar,
         private fb: FormBuilder,
         private groupRepo: GroupRepositoryService,
-        private pollService: PollService
+        public pollService: PollService
     ) {
         super(title, translate, snackbar);
 

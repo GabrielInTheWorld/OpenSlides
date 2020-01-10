@@ -9,9 +9,7 @@ const routes: Routes = [
     { path: '', component: AssignmentListComponent, pathMatch: 'full' },
     { path: 'new', component: AssignmentDetailComponent, data: { basePerm: 'assignments.can_manage' } },
     { path: ':id', component: AssignmentDetailComponent, data: { basePerm: 'assignments.can_see' } },
-    { path: 'polls', children: [
-        { path: ':id', component: AssignmentPollDetailComponent }
-     ] }
+    { path: 'polls', children: [{ path: ':id', component: AssignmentPollDetailComponent }] }
 ];
 
 @NgModule({

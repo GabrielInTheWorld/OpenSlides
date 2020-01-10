@@ -1,3 +1,4 @@
+
 import { ChartData } from 'app/shared/components/charts/charts.component';
 import { BasePoll, PollState } from 'app/shared/models/poll/base-poll';
 import { ViewAssignmentPoll } from 'app/site/assignments/models/view-assignment-poll';
@@ -6,7 +7,6 @@ import { ProjectorElementBuildDeskriptor } from 'app/site/base/projectable';
 import { ViewMotionPoll } from 'app/site/motions/models/view-motion-poll';
 import { ViewGroup } from 'app/site/users/models/view-group';
 import { ViewUser } from 'app/site/users/models/view-user';
-import { Label } from 'ng2-charts';
 
 export const PollClassTypeVerbose = {
     motion: 'Motion poll',

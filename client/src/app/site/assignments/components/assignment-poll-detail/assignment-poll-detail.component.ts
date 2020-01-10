@@ -8,8 +8,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { AssignmentPollRepositoryService } from 'app/core/repositories/assignments/assignment-poll-repository.service';
 import { GroupRepositoryService } from 'app/core/repositories/users/group-repository.service';
 import { PromptService } from 'app/core/ui-services/prompt.service';
-import { BasePollDetailComponent } from 'app/site/polls/components/base-poll-detail.component';
 import { AssignmentPollMethods } from 'app/shared/models/assignments/assignment-poll';
+import { BasePollDetailComponent } from 'app/site/polls/components/base-poll-detail.component';
 
 @Component({
     selector: 'os-assignment-poll-detail',

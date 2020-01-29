@@ -25,6 +25,13 @@ export class ThemeService {
     public static STANDARD_LOGO_DARK_THEME = '/assets/img/openslides-logo-dark.svg';
 
     /**
+     * Returns if the current selected theme is a dark one.
+     */
+    public get isDarkTheme(): boolean {
+        return this.currentTheme.includes('dark');
+    }
+
+    /**
      * Holds the current theme as member.
      */
     private currentTheme: string;
@@ -46,6 +53,22 @@ export class ThemeService {
     }
 
     /**
+     * Returns the logo relative to the used theme.
+     *
+     * @param shouldDefault If this method should return the default logo.
+     *
+     * @returns the path to the logo.
+     */
+    public getLogoRelativeToTheme(shouldDefault?: boolean): string {
+        if (this.currentTheme) {
+            return this.isDarkTheme && !shouldDefault
+                ? ThemeService.STANDARD_LOGO_DARK_THEME
+                : ThemeService.STANDARD_LOGO;
+        } else {
+            return null;
+        }
+    }
+    /**
      * Function to change the theme and ensures, that old themes are removed.
      *
      * @param theme The theme which is applied.
@@ -59,22 +82,5 @@ export class ThemeService {
             classList.remove(...toRemove); // Remove all old themes.
         }
         classList.add(theme, ThemeService.DEFAULT_THEME); // Add the new theme.
-    }
-
-    /**
-     * Returns the logo relative to the used theme.
-     *
-     * @param shouldDefault If this method should return the default logo.
-     *
-     * @returns the path to the logo.
-     */
-    public getLogoRelativeToTheme(shouldDefault?: boolean): string {
-        if (this.currentTheme) {
-            return this.currentTheme.includes('dark') && !shouldDefault
-                ? ThemeService.STANDARD_LOGO_DARK_THEME
-                : ThemeService.STANDARD_LOGO;
-        } else {
-            return null;
-        }
     }
 }

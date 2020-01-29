@@ -7,6 +7,7 @@ import { ChartOptions } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { Observable } from 'rxjs';
 
+import { ThemeService } from 'app/core/ui-services/theme.service';
 import { BaseViewComponent } from 'app/site/base/base-view';
 
 /**
@@ -39,6 +40,9 @@ export interface ChartDate {
  */
 export type ChartData = ChartDate[];
 
+/**
+ * Types for possible labelsize.
+ */
 export type ChartLegendSize = 'small' | 'middle';
 
 /**
@@ -95,6 +99,11 @@ export class ChartsComponent extends BaseViewComponent {
         return this._type;
     }
 
+    /**
+     * Sets the preferred labelsize for the legend.
+     *
+     * @param size The preferred size. Possible values are `'small'` or `'middle'`.
+     */
     @Input()
     public set chartLegendSize(size: ChartLegendSize) {
         this._chartLegendSize = size;
@@ -120,7 +129,7 @@ export class ChartsComponent extends BaseViewComponent {
      */
     @Input()
     public set legendPosition(position: Chart.PositionType) {
-        this.chartOptions.legend.position = position;
+        this.baseChartOptions.legend.position = position;
     }
 
     /**
@@ -134,6 +143,13 @@ export class ChartsComponent extends BaseViewComponent {
      */
     @Output()
     public hover = new EventEmitter<ChartEvent>();
+
+    /**
+     * Gets the preferred font color depending on the current selected theme.
+     */
+    public get fontColor(): string {
+        return this.theme.isDarkTheme ? '#FFF' : '#000';
+    }
 
     /**
      * The general data for the chart.
@@ -157,17 +173,41 @@ export class ChartsComponent extends BaseViewComponent {
     public circleColors: { backgroundColor?: string[]; hoverBackgroundColor?: string[] }[] = [];
 
     /**
+     * Holds the type of the chart - defaults to `bar`.
+     */
+    private _type: ChartType = 'bar';
+
+    /**
+     * Holds the legend's labelsize.
+     */
+    private _chartLegendSize: ChartLegendSize = 'middle';
+
+    /**
+     * Position of the legend.
+     */
+    private _legendPosition: Chart.PositionType = 'top';
+
+    /**
+     * Basic chart options both types of charts are using.
+     */
+    private baseChartOptions = {
+        responsive: true,
+        legend: {
+            position: this._legendPosition,
+            labels: {
+                fontColor: this.fontColor
+            }
+        }
+    };
+
+    /**
      * The options used for the charts.
      */
     public chartOptions: ChartOptions = {
-        responsive: true,
-        legend: {
-            position: 'top',
-            labels: {}
-        },
+        ...this.baseChartOptions,
         scales: {
-            xAxes: [{ ticks: { beginAtZero: true } }],
-            yAxes: [{ ticks: { beginAtZero: true } }]
+            xAxes: [{ ticks: { beginAtZero: true, fontColor: this.fontColor } }],
+            yAxes: [{ ticks: { beginAtZero: true, fontColor: this.fontColor } }]
         },
         plugins: {
             datalabels: {
@@ -181,15 +221,9 @@ export class ChartsComponent extends BaseViewComponent {
      * Chart option for pie and doughnut
      */
     public pieChartOptions: ChartOptions = {
-        aspectRatio: 1
+        aspectRatio: 1,
+        ...this.baseChartOptions
     };
-
-    /**
-     * Holds the type of the chart - defaults to `bar`.
-     */
-    private _type: ChartType = 'bar';
-
-    private _chartLegendSize: ChartLegendSize = 'middle';
 
     /**
      * Constructor.
@@ -203,7 +237,8 @@ export class ChartsComponent extends BaseViewComponent {
         title: Title,
         protected translate: TranslateService,
         matSnackbar: MatSnackBar,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private theme: ThemeService
     ) {
         super(title, translate, matSnackbar);
     }
@@ -218,6 +253,9 @@ export class ChartsComponent extends BaseViewComponent {
         });
     }
 
+    /**
+     * Adjusts the thickness of the chart's bars.
+     */
     private setupBar(): void {
         if (!this.chartData.every(date => date.barThickness && date.maxBarThickness)) {
             this.chartData = this.chartData.map(chartDate => ({
@@ -228,6 +266,9 @@ export class ChartsComponent extends BaseViewComponent {
         }
     }
 
+    /**
+     * Adjusts the legend's labelsize.
+     */
     private setupChartLegendSize(): void {
         switch (this._chartLegendSize) {
             case 'small':
@@ -246,6 +287,11 @@ export class ChartsComponent extends BaseViewComponent {
         this.cd.detectChanges();
     }
 
+    /**
+     * Check, if there should be displayed a stacked bar.
+     *
+     * @param chartType Optional. The type, the bar should display.
+     */
     private checkChartType(chartType?: ChartType): void {
         let type = chartType || this._type;
         if (type === 'stackedBar') {
@@ -253,9 +299,6 @@ export class ChartsComponent extends BaseViewComponent {
             this.setupBar();
             type = 'horizontalBar';
         }
-        // if (type === 'bar' || type === 'horizontalBar') {
-        //     this.setupBar();
-        // }
         this._type = type;
     }
 }

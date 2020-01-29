@@ -48,8 +48,13 @@
                 </a>
             </h3>
         </div>
-        <div *ngIf="poll.stateHasVotes">
-            <os-charts [type]="chartType" [labels]="candidatesLabels" [data]="chartDataSubject"></os-charts>
+        <div class="poll-chart-wrapper" [ngClass]="{ doughnut: chartType === 'doughnut' }" *ngIf="poll.stateHasVotes">
+            <os-charts
+                [type]="chartType"
+                [labels]="candidatesLabels"
+                [legendPosition]="chartType === 'doughnut' ? 'right' : 'top'"
+                [data]="chartDataSubject"
+            ></os-charts>
         </div>
     </div>
     <os-assignment-poll-vote *ngIf="poll.canBeVotedFor" [poll]="poll"></os-assignment-poll-vote>

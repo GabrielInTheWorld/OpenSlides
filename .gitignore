@@ -10,6 +10,10 @@
 # Old OS3 files and folders
 .coverage
 .mypy_cache
+.virtualenv
+node_modules
+package-lock.json
+.vscode
 Compodoc
 __pycache__
 bower_components
